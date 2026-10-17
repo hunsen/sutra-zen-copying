@@ -135,12 +135,32 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
             </span>
           </button>
 
-          {/* 纸墨笔参数弹出浮层 */}
+          {/* 外部遮罩用于点击关闭 */}
           {showThemeMenu && (
             <div
-              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 p-3 bg-stone-900/95 backdrop-blur-2xl border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-3 font-serif animate-fade-in"
-              onMouseLeave={() => setShowThemeMenu(false)}
+              className="fixed inset-0 z-40"
+              onClick={() => setShowThemeMenu(false)}
+            />
+          )}
+
+          {/* 纸墨笔参数弹出浮层（移动端全屏居中防溢出，桌面端吸附微调） */}
+          {showThemeMenu && (
+            <div
+              className="fixed sm:absolute top-14 sm:top-full left-1/2 -translate-x-1/2 sm:mt-2 w-[calc(100vw-32px)] max-w-xs sm:w-72 p-3 bg-stone-900/98 backdrop-blur-2xl border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-3 font-serif max-h-[calc(100vh-80px)] overflow-y-auto no-scrollbar animate-fade-in"
+              onPointerDown={(e) => e.stopPropagation()}
             >
+              <div className="flex items-center justify-between pb-1.5 border-b border-stone-800">
+                <span className="text-xs font-medium text-amber-200">文房四宝与字号</span>
+                <button
+                  type="button"
+                  onClick={() => setShowThemeMenu(false)}
+                  className="text-stone-400 hover:text-stone-200 text-[11px] px-1"
+                  title="关闭"
+                >
+                  ✕
+                </button>
+              </div>
+
               <div>
                 <span className="text-[11px] text-stone-400 tracking-wider">古典纸张</span>
                 <div className="grid grid-cols-2 gap-1.5 mt-1.5">
@@ -153,7 +173,6 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
                         type="button"
                         onClick={() => {
                           onSelectTheme(thm);
-                          setShowThemeMenu(false);
                         }}
                         className={`flex items-center gap-2 p-1.5 rounded-lg text-xs transition-all border ${
                           active
@@ -188,7 +207,6 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
                         type="button"
                         onClick={() => {
                           onSelectInk(ink);
-                          setShowThemeMenu(false);
                         }}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1 px-2 rounded-lg text-xs transition-all border ${
                           active
@@ -213,7 +231,7 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
                   <div className="flex items-center justify-between text-[11px] text-stone-400 tracking-wider">
                     <span className="flex items-center gap-1">
                       <Paintbrush size={11} className="text-amber-400" />
-                      <span>笔触粗细</span>
+                      <span>笔触字号粗细</span>
                     </span>
                     <span className="text-amber-300 font-mono">{brushThickness}px</span>
                   </div>
@@ -225,9 +243,9 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
                           key={bp.id}
                           type="button"
                           onClick={() => onSelectBrushThickness(bp.thickness)}
-                          className={`py-1 px-1 rounded-lg text-xs transition-all border flex flex-col items-center justify-center ${
+                          className={`py-1.5 px-1 rounded-lg text-xs transition-all border flex flex-col items-center justify-center active:scale-95 ${
                             active
-                              ? 'bg-amber-950/80 border-amber-500/80 text-amber-200'
+                              ? 'bg-amber-950/80 border-amber-500/80 text-amber-200 ring-1 ring-amber-500/50'
                               : 'bg-stone-800/60 border-transparent hover:border-stone-700 text-stone-400 hover:text-stone-200'
                           }`}
                         >

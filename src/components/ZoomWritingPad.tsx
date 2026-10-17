@@ -642,7 +642,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
   return (
     <div className="flex flex-col items-center select-none w-full max-w-[380px] mx-auto px-1">
       {/* 顶部指示条：当前字、笔画进度反馈与字模控制 */}
-      <div className="w-full flex items-center justify-between px-1 mb-1.5 sm:mb-2 text-stone-700 flex-shrink-0">
+      <div className="w-full flex items-center justify-between px-1 mb-1.5 sm:mb-2 text-stone-700 flex-shrink-0 relative z-30">
         <div className="flex items-center space-x-1.5 sm:space-x-2">
           <span className="text-[11px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-900/10 text-amber-950 font-serif font-medium border border-amber-900/20 whitespace-nowrap">
             第 {charIndex + 1}/{totalChars}
@@ -710,20 +710,38 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
             <span className="font-medium whitespace-nowrap">{currentThickness}px</span>
           </button>
 
+          {/* 点击外部区域关闭笔触弹窗遮罩 */}
+          {showBrushMenu && (
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setShowBrushMenu(false)}
+            />
+          )}
+
           {/* 毛笔粗细悬浮设置面板 */}
           {showBrushMenu && (
             <div
-              className="absolute top-full right-0 mt-2 w-64 p-3 bg-stone-900/95 backdrop-blur-xl border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-2.5 font-serif text-xs text-stone-200 animate-fade-in"
-              onMouseLeave={() => setShowBrushMenu(false)}
+              className="absolute top-full right-0 mt-2 w-64 p-3 bg-stone-900/98 backdrop-blur-2xl border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-2.5 font-serif text-xs text-stone-200 animate-fade-in"
+              onPointerDown={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between pb-1.5 border-b border-stone-800">
                 <div className="flex items-center gap-1.5">
                   <Paintbrush size={13} className="text-amber-400" />
-                  <span className="text-amber-200 font-medium">笔触粗细</span>
+                  <span className="text-amber-200 font-medium">笔触字号粗细</span>
                 </div>
-                <span className="font-mono text-xs px-1.5 py-0.5 bg-stone-800 rounded text-amber-300">
-                  {currentThickness} px
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-xs px-1.5 py-0.5 bg-stone-800 rounded text-amber-300">
+                    {currentThickness} px
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowBrushMenu(false)}
+                    className="text-stone-400 hover:text-stone-200 p-0.5 rounded text-[10px]"
+                    title="完成关闭"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
 
               {/* 实时笔锋墨点动态预览 */}
@@ -752,9 +770,9 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
                     key={preset.id}
                     type="button"
                     onClick={() => handleUpdateThickness(preset.thickness)}
-                    className={`py-1 px-1 rounded-lg text-center flex flex-col items-center justify-center transition-all border ${
+                    className={`py-1.5 px-1 rounded-lg text-center flex flex-col items-center justify-center transition-all border active:scale-95 ${
                       currentThickness === preset.thickness
-                        ? 'bg-amber-950/80 border-amber-500/80 text-amber-200 shadow-sm'
+                        ? 'bg-amber-950/80 border-amber-500/80 text-amber-200 shadow-sm ring-1 ring-amber-500/40'
                         : 'bg-stone-800/50 border-transparent hover:border-stone-700 text-stone-400 hover:text-stone-200'
                     }`}
                   >
@@ -930,13 +948,25 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
 
         {/* 模式选择弹出菜单 */}
         {showAdvanceMenu && (
-          <div
-            className="absolute bottom-full left-2 mb-2 w-72 p-3 bg-stone-900/95 backdrop-blur-xl border border-stone-700 rounded-2xl shadow-2xl z-40 flex flex-col gap-2 font-serif text-xs text-stone-200 animate-fade-in"
-            onMouseLeave={() => setShowAdvanceMenu(false)}
-          >
-            <span className="text-amber-400 font-medium pb-1 border-b border-stone-800">
-              选择适合您的抄经节奏
-            </span>
+          <>
+            <div
+              className="fixed inset-0 z-30"
+              onClick={() => setShowAdvanceMenu(false)}
+            />
+            <div
+              className="absolute bottom-full left-2 mb-2 w-72 p-3 bg-stone-900/98 backdrop-blur-xl border border-stone-700/80 rounded-2xl shadow-2xl z-40 flex flex-col gap-2 font-serif text-xs text-stone-200 animate-fade-in"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between pb-1 border-b border-stone-800">
+                <span className="text-amber-400 font-medium">选择抄经节奏</span>
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanceMenu(false)}
+                  className="text-stone-400 hover:text-stone-200 text-[10px]"
+                >
+                  ✕
+                </button>
+              </div>
 
             {/* 选项 1：智能模式 */}
             <button
@@ -1030,6 +1060,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
               </div>
             )}
           </div>
+          </>
         )}
       </div>
     </div>
