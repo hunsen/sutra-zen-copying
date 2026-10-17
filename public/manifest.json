@@ -1,0 +1,17 @@
+{
+  "name": "「静心抄经」- 跨平台离线书法手卷",
+  "short_name": "静心抄经",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#F4EFE6",
+  "theme_color": "#16212E",
+  "description": "专为平板手指触控设计的 100% 离线毛笔书法经卷抄写应用",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
