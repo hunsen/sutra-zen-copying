@@ -14,6 +14,7 @@ import {
   InkType,
   PAPER_THEMES,
   INK_COLORS,
+  BRUSH_PRESETS,
 } from '../types/sutra';
 import {
   BookOpen,
@@ -23,6 +24,7 @@ import {
   Clock,
   Download,
   Scroll,
+  Paintbrush,
 } from 'lucide-react';
 
 export interface TopZenCapsuleProps {
@@ -42,10 +44,14 @@ export interface TopZenCapsuleProps {
   isWriting?: boolean;
   /** 是否静音 */
   isMuted?: boolean;
+  /** 当前毛笔粗细 (px) */
+  brushThickness?: number;
   /** 切换纸张主题回调 */
   onSelectTheme: (theme: PaperTheme) => void;
   /** 切换墨色回调 */
   onSelectInk: (ink: InkType) => void;
+  /** 调节毛笔粗细回调 */
+  onSelectBrushThickness?: (thickness: number) => void;
   /** 静音切换回调 */
   onToggleMute: () => void;
   /** 点击藏经阁回调 */
@@ -78,8 +84,10 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
   durationSec,
   isWriting = false,
   isMuted = false,
+  brushThickness = 14,
   onSelectTheme,
   onSelectInk,
+  onSelectBrushThickness,
   onToggleMute,
   onOpenLibrary,
   onOpenExport,
@@ -113,22 +121,24 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
 
         <div className="w-[1px] h-3.5 bg-stone-700/80" />
 
-        {/* 纸墨主题切换下拉触发 */}
+        {/* 纸墨笔配置下拉触发 */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setShowThemeMenu(!showThemeMenu)}
             className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full hover:bg-stone-800 text-stone-300 hover:text-stone-100 transition-all font-serif text-xs active:scale-95"
-            title="选择纸张古笺与墨色"
+            title="选择纸张古笺、墨色与笔触粗细"
           >
             <Palette size={13} className="text-amber-400 flex-shrink-0" />
-            <span className="hidden sm:inline">{PAPER_THEMES[paperTheme]?.name}</span>
+            <span className="hidden sm:inline">
+              {PAPER_THEMES[paperTheme]?.name} · {brushThickness}px
+            </span>
           </button>
 
-          {/* 纸墨切换弹出浮层 */}
+          {/* 纸墨笔参数弹出浮层 */}
           {showThemeMenu && (
             <div
-              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-stone-900/95 backdrop-blur-2xl border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-3 font-serif animate-fade-in"
+              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 p-3 bg-stone-900/95 backdrop-blur-2xl border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-3 font-serif animate-fade-in"
               onMouseLeave={() => setShowThemeMenu(false)}
             >
               <div>
@@ -196,6 +206,39 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
                   })}
                 </div>
               </div>
+
+              {/* 毛笔笔触粗细 */}
+              {onSelectBrushThickness && (
+                <div>
+                  <div className="flex items-center justify-between text-[11px] text-stone-400 tracking-wider">
+                    <span className="flex items-center gap-1">
+                      <Paintbrush size={11} className="text-amber-400" />
+                      <span>笔触粗细</span>
+                    </span>
+                    <span className="text-amber-300 font-mono">{brushThickness}px</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1 mt-1.5">
+                    {BRUSH_PRESETS.map((bp) => {
+                      const active = brushThickness === bp.thickness;
+                      return (
+                        <button
+                          key={bp.id}
+                          type="button"
+                          onClick={() => onSelectBrushThickness(bp.thickness)}
+                          className={`py-1 px-1 rounded-lg text-xs transition-all border flex flex-col items-center justify-center ${
+                            active
+                              ? 'bg-amber-950/80 border-amber-500/80 text-amber-200'
+                              : 'bg-stone-800/60 border-transparent hover:border-stone-700 text-stone-400 hover:text-stone-200'
+                          }`}
+                        >
+                          <span className="font-medium text-[11px] leading-tight">{bp.name}</span>
+                          <span className="text-[9px] text-stone-500 mt-0.5">{bp.thickness}px</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -55,6 +55,27 @@ export const App: React.FC = () => {
   const [sealText, setSealText] = useState<string>('静心');
   const [durationSec, setDurationSec] = useState<number>(0);
 
+  // 毛笔笔触粗细（默认 14px 兼毫中楷，支持本地持久化存储）
+  const [brushThickness, setBrushThickness] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sutra_brush_thickness');
+      if (saved) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val) && val >= 6 && val <= 32) {
+          return val;
+        }
+      }
+    }
+    return 14;
+  });
+
+  const handleBrushThicknessChange = useCallback((thickness: number) => {
+    setBrushThickness(thickness);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sutra_brush_thickness', String(thickness));
+    }
+  }, []);
+
   // 交互态反馈
   const [isWriting, setIsWriting] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -380,8 +401,10 @@ export const App: React.FC = () => {
         durationSec={durationSec}
         isWriting={isWriting}
         isMuted={isMuted}
+        brushThickness={brushThickness}
         onSelectTheme={handleSelectTheme}
         onSelectInk={handleSelectInk}
+        onSelectBrushThickness={handleBrushThicknessChange}
         onToggleMute={handleToggleMute}
         onOpenLibrary={handleOpenLibrary}
         onOpenExport={handleOpenExport}
@@ -458,6 +481,8 @@ export const App: React.FC = () => {
             inkType={inkType}
             sessionId={sessionId}
             initialStrokes={initialStrokesForCurrent}
+            brushThickness={brushThickness}
+            onBrushThicknessChange={handleBrushThicknessChange}
             onStrokesChange={setLiveStrokes}
             onWritingChange={setIsWriting}
             onCharComplete={handleCharComplete}

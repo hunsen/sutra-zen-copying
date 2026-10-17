@@ -18,6 +18,8 @@ import {
   INK_COLORS,
   PAPER_THEMES,
   BrushConfig,
+  BRUSH_PRESETS,
+  createBrushConfigFromThickness,
 } from '../types/sutra';
 import {
   FingerBrushTracker,
@@ -42,6 +44,7 @@ import {
   Sparkles,
   Check,
   SlidersHorizontal,
+  Paintbrush,
 } from 'lucide-react';
 
 export type AdvanceMode = 'smart' | 'manual' | 'timed';
@@ -73,6 +76,10 @@ export interface ZoomWritingPadProps {
   onNextChar?: () => void;
   /** 笔刷物理引擎微调参数（可选） */
   brushConfig?: Partial<BrushConfig>;
+  /** 当前毛笔粗细 (px)（可选） */
+  brushThickness?: number;
+  /** 调节毛笔粗细回调（可选） */
+  onBrushThicknessChange?: (thickness: number) => void;
 }
 
 const PAD_SIZE = 380; // 放大米字格设计基准尺寸 (px)
@@ -91,14 +98,29 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
   onPrevChar,
   onNextChar,
   brushConfig,
+  brushThickness,
+  onBrushThicknessChange,
 }) => {
   // 画布 DOM 引用（双层设计：底层为纸张背景与字模，顶层为笔墨轨迹）
   const bgCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const strokeCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  // 毛笔粗细状态（支持外部受控与内部自管）
+  const [localThickness, setLocalThickness] = useState<number>(brushThickness || 14);
+  const [showBrushMenu, setShowBrushMenu] = useState(false);
+  const currentThickness = brushThickness ?? localThickness;
+
+  const handleUpdateThickness = (newThickness: number) => {
+    setLocalThickness(newThickness);
+    onBrushThicknessChange?.(newThickness);
+  };
+
   // 笔刷动力学跟踪器
   const trackerRef = useRef<FingerBrushTracker>(
-    new FingerBrushTracker(PAD_SIZE, PAD_SIZE, brushConfig)
+    new FingerBrushTracker(PAD_SIZE, PAD_SIZE, {
+      ...createBrushConfigFromThickness(currentThickness),
+      ...brushConfig,
+    })
   );
 
   // 书写状态与笔画列表（使用 ref 同步保证 PointerMove 毫秒级零丢帧）
@@ -216,12 +238,14 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
     }
   }, [currentCharKey, cancelAutoAdvance, initialStrokes, onStrokesChange]);
 
-  // 更新笔刷参数
+  // 更新笔刷参数（包含粗细动力学同步）
   useEffect(() => {
-    if (brushConfig) {
-      trackerRef.current.updateConfig(brushConfig);
-    }
-  }, [brushConfig]);
+    const computedConfig = {
+      ...createBrushConfigFromThickness(currentThickness),
+      ...brushConfig,
+    };
+    trackerRef.current.updateConfig(computedConfig);
+  }, [currentThickness, brushConfig]);
 
   /**
    * 绘制底层画布（纸张纹理 + 米字格虚线 + 楷体底字）
@@ -645,8 +669,9 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
           </span>
         </div>
 
-        {/* 字模透明度控制胶囊 */}
-        <div className="flex items-center space-x-1.5 bg-stone-100/80 backdrop-blur-sm px-2 py-0.5 sm:py-1 rounded-full border border-stone-200/80 text-xs">
+        {/* 字模透明度与笔触粗细控制胶囊 */}
+        <div className="relative flex items-center space-x-1.5 bg-stone-100/85 backdrop-blur-sm px-2 py-0.5 sm:py-1 rounded-full border border-stone-200/80 text-xs shadow-sm">
+          {/* 字模显隐与浓度 */}
           <button
             type="button"
             onClick={() => setShowGuideChar(!showGuideChar)}
@@ -663,9 +688,99 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
               step="0.02"
               value={guideOpacity}
               onChange={(e) => setGuideOpacity(parseFloat(e.target.value))}
-              className="w-10 sm:w-14 h-1 bg-stone-300 rounded-lg appearance-none cursor-pointer accent-amber-800"
+              className="w-8 sm:w-12 h-1 bg-stone-300 rounded-lg appearance-none cursor-pointer accent-amber-800"
               title="调节底稿浓度"
             />
+          )}
+
+          <div className="w-[1px] h-3 bg-stone-300" />
+
+          {/* 笔触粗细调节弹出按钮 */}
+          <button
+            type="button"
+            onClick={() => setShowBrushMenu(!showBrushMenu)}
+            className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full transition-all text-[11px] font-serif ${
+              showBrushMenu
+                ? 'bg-amber-900 text-amber-100 shadow-inner'
+                : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
+            }`}
+            title="调节毛笔粗细"
+          >
+            <Paintbrush size={12} className="text-amber-800 flex-shrink-0" />
+            <span className="font-medium whitespace-nowrap">{currentThickness}px</span>
+          </button>
+
+          {/* 毛笔粗细悬浮设置面板 */}
+          {showBrushMenu && (
+            <div
+              className="absolute top-full right-0 mt-2 w-64 p-3 bg-stone-900/95 backdrop-blur-xl border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-2.5 font-serif text-xs text-stone-200 animate-fade-in"
+              onMouseLeave={() => setShowBrushMenu(false)}
+            >
+              <div className="flex items-center justify-between pb-1.5 border-b border-stone-800">
+                <div className="flex items-center gap-1.5">
+                  <Paintbrush size={13} className="text-amber-400" />
+                  <span className="text-amber-200 font-medium">笔触粗细</span>
+                </div>
+                <span className="font-mono text-xs px-1.5 py-0.5 bg-stone-800 rounded text-amber-300">
+                  {currentThickness} px
+                </span>
+              </div>
+
+              {/* 实时笔锋墨点动态预览 */}
+              <div className="w-full h-11 rounded-xl bg-stone-800/80 border border-stone-700/60 flex items-center justify-between px-3">
+                <span className="text-[10px] text-stone-400">落笔预览：</span>
+                <div className="flex-1 flex items-center justify-center">
+                  <div
+                    className="rounded-full transition-all duration-150 shadow-sm"
+                    style={{
+                      width: `${Math.max(4, Math.min(28, currentThickness * 1.3))}px`,
+                      height: `${Math.max(4, Math.min(28, currentThickness * 1.3))}px`,
+                      backgroundColor: inkHex,
+                      boxShadow: `0 0 6px ${inkHex}50`,
+                    }}
+                  />
+                </div>
+                <span className="text-[11px] font-serif text-amber-200/90 whitespace-nowrap">
+                  {BRUSH_PRESETS.find((p) => p.thickness === currentThickness)?.name || '自定义'}
+                </span>
+              </div>
+
+              {/* 4 个经典古法档位快捷切换 */}
+              <div className="grid grid-cols-4 gap-1">
+                {BRUSH_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => handleUpdateThickness(preset.thickness)}
+                    className={`py-1 px-1 rounded-lg text-center flex flex-col items-center justify-center transition-all border ${
+                      currentThickness === preset.thickness
+                        ? 'bg-amber-950/80 border-amber-500/80 text-amber-200 shadow-sm'
+                        : 'bg-stone-800/50 border-transparent hover:border-stone-700 text-stone-400 hover:text-stone-200'
+                    }`}
+                  >
+                    <span className="text-[11px] font-medium leading-none">{preset.name}</span>
+                    <span className="text-[9px] text-stone-500 mt-1">{preset.thickness}px</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* 连续微调滑块 */}
+              <div className="flex flex-col gap-1 pt-1">
+                <div className="flex items-center justify-between text-[10px] text-stone-400">
+                  <span>细 (6px)</span>
+                  <span>粗 (30px)</span>
+                </div>
+                <input
+                  type="range"
+                  min="6"
+                  max="30"
+                  step="1"
+                  value={currentThickness}
+                  onChange={(e) => handleUpdateThickness(parseInt(e.target.value, 10))}
+                  className="w-full h-1.5 bg-stone-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>

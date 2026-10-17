@@ -277,6 +277,36 @@ export const DEFAULT_BRUSH_CONFIG: BrushConfig = {
 };
 
 /**
+ * 毛笔经典档位预设
+ */
+export interface BrushPreset {
+  id: string;
+  name: string;
+  desc: string;
+  thickness: number;
+}
+
+export const BRUSH_PRESETS: BrushPreset[] = [
+  { id: 'fine', name: '小楷', desc: '秀丽细锋', thickness: 9 },
+  { id: 'medium', name: '中楷', desc: '兼毫标准', thickness: 14 },
+  { id: 'bold', name: '大楷', desc: '羊毫圆浑', thickness: 20 },
+  { id: 'heavy', name: '榜书', desc: '浓墨厚重', thickness: 26 },
+];
+
+/**
+ * 根据基础笔触粗细 (px) 生成对应的动力学笔刷参数
+ */
+export function createBrushConfigFromThickness(thickness: number): Partial<BrushConfig> {
+  const rMax = Math.max(6, Math.min(32, thickness));
+  const rMin = Math.max(1.0, Number((rMax * 0.16).toFixed(1)));
+  return {
+    rMax,
+    rMin,
+    dwellMinDisplacement: Math.max(4, Math.round(rMax * 0.55)),
+  };
+}
+
+/**
  * 默认音频配置
  */
 export const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
