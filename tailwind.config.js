@@ -19,15 +19,18 @@ export default {
           'sans-serif',
         ],
       },
+      opacity: {
+        98: '0.98',
+      },
       animation: {
-        'fade-in': 'fadeIn 0.25s ease-out forwards',
+        'fade-in': 'fadeIn 0.2s ease-out forwards',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'breathe-gold': 'breatheGold 2.4s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0', transform: 'scale(0.96)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
         breatheGold: {
           '0%, 100%': {

@@ -1,0 +1,74 @@
+[
+  {
+    "screenshot": "canvas-ciqing-black.jpg",
+    "size": [
+      338,
+      338
+    ],
+    "jpegCenterBandCountsWithin14": {
+      "gold": 0,
+      "cinnabar": 0,
+      "black": 3810
+    }
+  },
+  {
+    "screenshot": "canvas-ciqing-cinnabar.jpg",
+    "size": [
+      338,
+      338
+    ],
+    "jpegCenterBandCountsWithin14": {
+      "gold": 0,
+      "cinnabar": 60,
+      "black": 744
+    }
+  },
+  {
+    "screenshot": "canvas-ciqing-gold.jpg",
+    "size": [
+      338,
+      338
+    ],
+    "jpegCenterBandCountsWithin14": {
+      "gold": 2024,
+      "cinnabar": 0,
+      "black": 1004
+    }
+  },
+  {
+    "screenshot": "canvas-xuan-black.jpg",
+    "size": [
+      338,
+      338
+    ],
+    "jpegCenterBandCountsWithin14": {
+      "gold": 0,
+      "cinnabar": 0,
+      "black": 2318
+    }
+  },
+  {
+    "screenshot": "canvas-xuan-cinnabar.jpg",
+    "size": [
+      338,
+      338
+    ],
+    "jpegCenterBandCountsWithin14": {
+      "gold": 0,
+      "cinnabar": 28,
+      "black": 0
+    }
+  },
+  {
+    "screenshot": "canvas-xuan-gold.jpg",
+    "size": [
+      338,
+      338
+    ],
+    "jpegCenterBandCountsWithin14": {
+      "gold": 2064,
+      "cinnabar": 0,
+      "black": 0
+    }
+  }
+]

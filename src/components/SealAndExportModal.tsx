@@ -6,13 +6,15 @@
 // 3. 笔迹倍速回放 (Time-Lapse Replay)：5x/10x/20x 动态再现一笔一画
 // ============================================================================
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   SutraDocument,
   WrittenCharRecord,
   PaperTheme,
   InkType,
   SealConfig,
+  INK_COLORS,
+  PAPER_THEMES,
 } from '../types/sutra';
 import { DEDICATION_TEMPLATES } from '../data/builtInSutras';
 import {
@@ -77,8 +79,8 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
   const [currentReplayChar, setCurrentReplayChar] = useState('');
 
   // 绘制印章微缩预览
-  useEffect(() => {
-    const canvas = sealCanvasRef.current;
+  const renderSeal = useCallback((targetCanvas?: HTMLCanvasElement | null) => {
+    const canvas = targetCanvas || sealCanvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
@@ -98,6 +100,15 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
 
     drawSealOnCanvas(ctx, 4, 4, size - 8, cfg);
   }, [sealText, sealStyle]);
+
+  // 当模态框打开、切回导出标签、或者印章文字/样式变更时均重新绘制
+  useEffect(() => {
+    if (isOpen && activeTab === 'export') {
+      renderSeal();
+      const raf = requestAnimationFrame(() => renderSeal());
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isOpen, activeTab, renderSeal]);
 
   // 当模态框重新开启时同步最新的印章与回向文
   useEffect(() => {
@@ -131,6 +142,40 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
     };
   }, [isOpen, activeTab, sutra.content, writtenChars]);
 
+  // 回放初始画面预览（展示当前纸张底色与虚线米字格）
+  useEffect(() => {
+    if (isOpen && activeTab === 'replay') {
+      const canvas = replayCanvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          const padSize = 340;
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = padSize * dpr;
+          canvas.height = padSize * dpr;
+          ctx.save();
+          ctx.scale(dpr, dpr);
+          drawPaperBackground(ctx, paperTheme, padSize, padSize);
+          const themeConfig = PAPER_THEMES[paperTheme] || PAPER_THEMES.xuan;
+          const gridColor = themeConfig.gridColor || '#C8B69E';
+          ctx.save();
+          ctx.strokeStyle = gridColor;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+          ctx.strokeRect(12, 12, padSize - 24, padSize - 24);
+          ctx.beginPath();
+          ctx.moveTo(12, padSize / 2);
+          ctx.lineTo(padSize - 12, padSize / 2);
+          ctx.moveTo(padSize / 2, 12);
+          ctx.lineTo(padSize / 2, padSize - 12);
+          ctx.stroke();
+          ctx.restore();
+          ctx.restore();
+        }
+      }
+    }
+  }, [isOpen, activeTab, paperTheme]);
+
   /**
    * 渲染单帧回放画面到 Canvas（支持高分屏 DPR 抗锯齿）
    */
@@ -158,9 +203,13 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
     // 纸张底色
     drawPaperBackground(ctx, paperTheme, padSize, padSize);
 
+    const themeConfig = PAPER_THEMES[paperTheme] || PAPER_THEMES.xuan;
+    const gridColor = themeConfig.gridColor || '#C8B69E';
+    const inkHex = INK_COLORS[inkType] || '#1C1B19';
+
     // 米字格虚线
     ctx.save();
-    ctx.strokeStyle = '#C8B69E';
+    ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.strokeRect(12, 12, padSize - 24, padSize - 24);
@@ -172,9 +221,9 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
     ctx.stroke();
     ctx.restore();
 
-    // 绘制已有笔画
+    // 绘制已有笔画（采用与当前书写/导出一致的墨色）
     state.strokesSoFar.forEach((stroke) => {
-      renderStrokeToCanvas(ctx, stroke, padSize, padSize, '#1C1B19', 1.5);
+      renderStrokeToCanvas(ctx, stroke, padSize, padSize, inkHex, 1.5);
     });
 
     ctx.restore();
@@ -293,7 +342,12 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
                 <div className="flex flex-col items-center">
                   <span className="text-xs text-stone-400 mb-2">印章实景预览</span>
                   <canvas
-                    ref={sealCanvasRef}
+                    ref={(node) => {
+                      sealCanvasRef.current = node;
+                      if (node) {
+                        renderSeal(node);
+                      }
+                    }}
                     className="w-24 h-24 rounded-lg shadow-md bg-stone-950/40 p-1"
                   />
                 </div>

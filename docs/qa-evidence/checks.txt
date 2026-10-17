@@ -1,0 +1,33 @@
+独立 QA 检查记录
+日期：2026-10-17（Asia/Shanghai）
+基线：e8209cd（检查开始时 git status --short 为空）
+
+npm run typecheck
+结果：退出码 0，tsc --noEmit 通过。
+
+./node_modules/.bin/vite build --outDir /private/tmp/sutra-independent-qa-build-20261017
+结果：退出码 0，1585 modules transformed，built in 5.00s。
+PWA generateSW：precache 6 entries (290.29 KiB)。
+输出到临时目录，未覆盖项目 dist。
+
+生产 manifest.webmanifest 引用：
+/pwa-192x192.png
+/pwa-512x512.png
+上述两个 PNG 均不在 public 或本次生产构建目录中。
+实际构建文件：index.html、registerSW.js、manifest.webmanifest、manifest.json、favicon.svg、sw.js、workbox-dcde9eb3.js、assets/index-BGwbdH13.css、assets/index-DS0JuUc-.js。
+
+浏览器 DOM 实测：
+1440x900：左 section x16 y56 w982 h200，max-height:200px；右 section x1014 y56 w410 h836。
+1920x1080：左 section x16 y56 w1462 h200；右 section x1494 y56 w410 h1016。
+390x844 顶栏纸墨菜单：关闭按钮 x485.61..502.00；古籍竹纸 x358.00..502.00；朱砂墨 x409.33..502.00；榜书 x431.50..502.00。屏幕右边界 x390。
+320x568：智能走纸模式按钮 y553.14..574.14；viewport 高 568，body overflow:hidden。
+844x390：左 section x16 y56 w386 h200；右 section x418 y56 w410 h326。
+生产 1440x900 笔触菜单 computed background-color:rgba(0, 0, 0, 0)。
+
+草稿用例：自建 QA草稿恢复，正文“一，二。三！abc123”被提取为3字；手动模式第一字写一笔，未提交；等待超过15秒后刷新，笔画从圆满(1/1)变成0/1笔。
+清空用例：已提交心经第1字的一笔 -> 返回上一字 -> 重写 -> 写完走纸 -> 返回上一字，旧笔迹恢复为1/6笔。
+完成用例：QA草稿恢复，提交第1字，跳过第2字，末字写一笔并圆满结卷 -> 功德簿已圆满、进度2/3、圆满1部；经过自动保存并重新打开 -> 已圆满标记消失、圆满0部。
+
+PNG 下载：点击过下载按钮，下载事件等待超时，浏览器自动化连接重建；未获取可检查的最终PNG文件。此为验证限制，未判定应用导出失败。
+浏览器查询的 error/warn 日志未返回应用错误；这不能证明所有运行阶段均无错误。
+截图由浏览器返回 JPEG 字节，已使用 .jpg 后缀。12号截图受工具截图宽度限制，实际1792x1080；1920视口以DOM测量为准。

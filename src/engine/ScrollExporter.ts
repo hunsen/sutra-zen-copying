@@ -309,15 +309,29 @@ export function downloadScrollImage(
   fileName?: string
 ): void {
   const canvas = renderFullScrollToCanvas(options);
-  const dataUrl = canvas.toDataURL('image/png');
-
   const defaultName = `${options.sutra.title}_装裱长卷_${new Date().toISOString().slice(0, 10)}.png`;
-  const link = document.createElement('a');
-  link.download = fileName || defaultName;
-  link.href = dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+
+  if (typeof canvas.toBlob === 'function') {
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = fileName || defaultName;
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }, 'image/png');
+  } else {
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = fileName || defaultName;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
 
 // ============================================================================

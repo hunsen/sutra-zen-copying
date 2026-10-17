@@ -92,8 +92,8 @@ export const App: React.FC = () => {
   // 保持会话起始时间稳定
   const startedAtRef = useRef<number>(Date.now());
 
-  // 实时单字笔迹同步至全景画卷
   const [liveStrokes, setLiveStrokes] = useState<BrushStroke[]>(EMPTY_STROKES);
+  const [completedAt, setCompletedAt] = useState<number | undefined>(undefined);
 
   // 保持对最新状态的引用以供定期持久化，杜绝计时器频繁重启
   const stateRef = useRef({
@@ -106,6 +106,7 @@ export const App: React.FC = () => {
     dedicationText,
     sealText,
     durationSec,
+    completedAt,
   });
   stateRef.current = {
     sessionId,
@@ -117,6 +118,7 @@ export const App: React.FC = () => {
     dedicationText,
     sealText,
     durationSec,
+    completedAt,
   };
 
   /**
@@ -136,6 +138,7 @@ export const App: React.FC = () => {
           setCurrentIndex(lastSession.currentIndex || 0);
           setWrittenChars(lastSession.writtenChars || {});
           setLiveStrokes(lastSession.writtenChars?.[lastSession.currentIndex || 0]?.strokes ?? EMPTY_STROKES);
+          setCompletedAt(lastSession.completedAt);
           setDedicationText(
             lastSession.dedicationText ||
               '愿以此功德，普及于一切，我等与众生，皆共成佛道。'
@@ -218,6 +221,7 @@ export const App: React.FC = () => {
       startedAt: startedAtRef.current,
       totalDurationSec: cur.durationSec,
       lastActiveAt: Date.now(),
+      completedAt: cur.completedAt,
       ...overrides,
     };
 
@@ -240,6 +244,34 @@ export const App: React.FC = () => {
   }, [isLoaded, persistSession]);
 
   /**
+   * 当前书写台笔画实时同步（保证未提交笔画、撤销与清空与会话状态实时一致，杜绝覆盖与幽灵笔迹）
+   */
+  const handleStrokesChange = useCallback(
+    (strokes: BrushStroke[]) => {
+      setLiveStrokes(strokes);
+      setWrittenChars((prev) => {
+        const existing = prev[currentIndex];
+        if (strokes.length === 0) {
+          if (!existing) return prev;
+          const next = { ...prev };
+          delete next[currentIndex];
+          return next;
+        }
+        return {
+          ...prev,
+          [currentIndex]: {
+            charIndex: currentIndex,
+            character: sutra.content[currentIndex] || '',
+            strokes: [...strokes],
+            updatedAt: Date.now(),
+          },
+        };
+      });
+    },
+    [currentIndex, sutra.content]
+  );
+
+  /**
    * 单字书写完成（自动走纸或手动确认）回调处理
    */
   const handleCharComplete = useCallback(
@@ -256,20 +288,36 @@ export const App: React.FC = () => {
         console.warn('写入单字字迹记录失败:', err)
       );
 
-      // 平滑推进到下一字
-      if (currentIndex < sutra.content.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
-      } else {
-        // 全篇圆满，播放铜磬长余音，并弹窗提示导出长卷
+      // 严格检查全篇是否真正圆满：必须每一个字索引都至少有一笔
+      const totalChars = sutra.content.length;
+      const isAllCharsFinished =
+        totalChars > 0 &&
+        Array.from({ length: totalChars }, (_, i) => i).every(
+          (i) => (nextWritten[i]?.strokes?.length ?? 0) > 0
+        );
+
+      if (currentIndex < totalChars - 1) {
+        const nextIdx = currentIndex + 1;
+        setCurrentIndex(nextIdx);
+        setLiveStrokes(nextWritten[nextIdx]?.strokes ?? EMPTY_STROKES);
+      } else if (isAllCharsFinished) {
+        // 全篇所有汉字均抄写完毕，圆满结卷
+        const now = Date.now();
+        setCompletedAt(now);
         zenAudio.playSingingBowl(6.0, 432);
         setShowExportModal(true);
         persistSession({
-          completedAt: Date.now(),
+          completedAt: now,
+          writtenChars: nextWritten,
+        });
+      } else {
+        // 到达末字但尚有未写全的缺字：仅持久化当前字笔画，不伪造全篇圆满标记
+        persistSession({
           writtenChars: nextWritten,
         });
       }
     },
-    [currentIndex, persistSession, sessionId, sutra.content.length, writtenChars]
+    [currentIndex, persistSession, sessionId, sutra.content, writtenChars]
   );
 
   /**
@@ -321,6 +369,7 @@ export const App: React.FC = () => {
     setCurrentIndex(0);
     setWrittenChars({});
     setLiveStrokes(EMPTY_STROKES);
+    setCompletedAt(undefined);
     setDurationSec(0);
     const now = Date.now();
     startedAtRef.current = now;
@@ -357,6 +406,7 @@ export const App: React.FC = () => {
       setCurrentIndex(s.currentIndex || 0);
       setWrittenChars(s.writtenChars || {});
       setLiveStrokes(s.writtenChars?.[s.currentIndex || 0]?.strokes ?? EMPTY_STROKES);
+      setCompletedAt(s.completedAt);
       setDedicationText(s.dedicationText || dedicationText);
       setSealText(s.sealText || sealText);
       setDurationSec(s.totalDurationSec || 0);
@@ -412,12 +462,12 @@ export const App: React.FC = () => {
 
       {/* 主工作区：响应式双区联动布局（适配移动端横竖屏与桌面/平板双模式） */}
       <main className="w-full h-full flex flex-col landscape:flex-row lg:flex-row pt-12 sm:pt-14 pb-1 sm:pb-2 px-1.5 sm:px-4 gap-1.5 sm:gap-4 overflow-hidden">
-        {/* 左区：竖排从右至左全景手卷预览与浏览区（宽屏下占满全部剩余宽度，全屏模式下占满 100%） */}
+        {/* 左区：竖排从右至左全景手卷预览与浏览区（宽屏下解除最大高度，占满全部剩余空间） */}
         <section
           className={`relative rounded-xl sm:rounded-2xl overflow-hidden border border-stone-800/20 shadow-inner flex items-center justify-center p-1 sm:p-2 transition-all duration-300 ${
             isScrollExpandedMobile
               ? 'flex-1 w-full h-full'
-              : 'flex-none h-[26vh] min-h-[145px] max-h-[200px] landscape:h-full landscape:flex-1 landscape:w-auto lg:h-full lg:flex-1 lg:w-auto'
+              : 'flex-none h-[26vh] min-h-[145px] max-h-[200px] landscape:h-full landscape:min-h-0 landscape:max-h-none landscape:flex-1 landscape:w-auto lg:h-full lg:min-h-0 lg:max-h-none lg:flex-1 lg:w-auto'
           }`}
           style={{
             background:
@@ -467,7 +517,7 @@ export const App: React.FC = () => {
 
         {/* 右区：黄金落笔区——手指专属放大米字格书写台（宽屏下紧凑停靠 ~410px，留出最大区域给长卷） */}
         <section
-          className={`flex flex-col items-center justify-center relative p-1 sm:p-4 overflow-hidden transition-all duration-300 ${
+          className={`flex flex-col items-center justify-center relative p-1 sm:p-4 overflow-x-hidden overflow-y-auto no-scrollbar transition-all duration-300 ${
             isScrollExpandedMobile
               ? 'hidden'
               : 'flex-1 min-h-0 landscape:h-full landscape:flex-none landscape:w-[410px] xl:w-[440px] lg:h-full lg:flex-none lg:w-[420px]'
@@ -483,7 +533,7 @@ export const App: React.FC = () => {
             initialStrokes={initialStrokesForCurrent}
             brushThickness={brushThickness}
             onBrushThicknessChange={handleBrushThicknessChange}
-            onStrokesChange={setLiveStrokes}
+            onStrokesChange={handleStrokesChange}
             onWritingChange={setIsWriting}
             onCharComplete={handleCharComplete}
             onPrevChar={() => {

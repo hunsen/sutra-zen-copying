@@ -1,0 +1,45 @@
+{
+  "manifest": {
+    "name": "「静心抄经」- 跨平台离线书法手卷",
+    "short_name": "静心抄经",
+    "description": "专为平板手指触控设计的 100% 离线毛笔书法经卷抄写应用",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#F4EFE6",
+    "theme_color": "#16212E",
+    "lang": "en",
+    "scope": "./",
+    "orientation": "landscape",
+    "icons": [
+      {
+        "src": "pwa-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "pwa-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ]
+  },
+  "icons": [
+    {
+      "src": "pwa-192x192.png",
+      "exists": true,
+      "pngSignature": true,
+      "width": 192,
+      "height": 192,
+      "bytes": 8475
+    },
+    {
+      "src": "pwa-512x512.png",
+      "exists": true,
+      "pngSignature": true,
+      "width": 512,
+      "height": 512,
+      "bytes": 23438
+    }
+  ]
+}

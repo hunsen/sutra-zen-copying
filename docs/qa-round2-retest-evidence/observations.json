@@ -1,0 +1,235 @@
+[
+  {
+    "case": "R01",
+    "clientWidth": 318,
+    "inks": [
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 272,
+          "height": 26,
+          "left": 48,
+          "right": 142,
+          "top": 246,
+          "width": 94,
+          "x": 48,
+          "y": 246
+        },
+        "text": "松烟墨"
+      },
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 272,
+          "height": 26,
+          "left": 148,
+          "right": 242,
+          "top": 246,
+          "width": 94,
+          "x": 148,
+          "y": 246
+        },
+        "text": "泥金墨"
+      },
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 272,
+          "height": 26,
+          "left": 248,
+          "right": 342,
+          "top": 246,
+          "width": 94,
+          "x": 248,
+          "y": 246
+        },
+        "text": "朱砂墨"
+      }
+    ],
+    "rect": {
+      "bottom": 365.25,
+      "height": 309.25,
+      "left": 35,
+      "right": 355,
+      "top": 56,
+      "width": 320,
+      "x": 35,
+      "y": 56
+    },
+    "scrollWidth": 318,
+    "viewport": [
+      390,
+      844
+    ]
+  },
+  {
+    "case": "R01",
+    "clientWidth": 294,
+    "inks": [
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 272,
+          "height": 26,
+          "left": 25,
+          "right": 111,
+          "top": 246,
+          "width": 86,
+          "x": 25,
+          "y": 246
+        },
+        "text": "松烟墨"
+      },
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 272,
+          "height": 26,
+          "left": 117,
+          "right": 203,
+          "top": 246,
+          "width": 86,
+          "x": 117,
+          "y": 246
+        },
+        "text": "泥金墨"
+      },
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 272,
+          "height": 26,
+          "left": 209,
+          "right": 295,
+          "top": 246,
+          "width": 86,
+          "x": 209,
+          "y": 246
+        },
+        "text": "朱砂墨"
+      }
+    ],
+    "rect": {
+      "bottom": 365.25,
+      "height": 309.25,
+      "left": 12,
+      "right": 308,
+      "top": 56,
+      "width": 296,
+      "x": 12,
+      "y": 56
+    },
+    "scrollWidth": 294,
+    "viewport": [
+      320,
+      568
+    ]
+  },
+  {
+    "case": "R01",
+    "clientWidth": 286,
+    "inks": [
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 274,
+          "height": 26,
+          "left": 591,
+          "right": 671.6640625,
+          "top": 248,
+          "width": 80.6640625,
+          "x": 591,
+          "y": 248
+        },
+        "text": "松烟墨"
+      },
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 274,
+          "height": 26,
+          "left": 679.6640625,
+          "right": 760.328125,
+          "top": 248,
+          "width": 80.6640625,
+          "x": 679.6640625,
+          "y": 248
+        },
+        "text": "泥金墨"
+      },
+      {
+        "labelScrollWidth": 36,
+        "labelWidth": 36,
+        "rect": {
+          "bottom": 274,
+          "height": 26,
+          "left": 768.328125,
+          "right": 848.9921875,
+          "top": 248,
+          "width": 80.6640625,
+          "x": 768.328125,
+          "y": 248
+        },
+        "text": "朱砂墨"
+      }
+    ],
+    "rect": {
+      "bottom": 369.25,
+      "height": 313.25,
+      "left": 576,
+      "right": 864,
+      "top": 56,
+      "width": 288,
+      "x": 576,
+      "y": 56
+    },
+    "scrollWidth": 286,
+    "viewport": [
+      1440,
+      900
+    ]
+  },
+  {
+    "case": "R02",
+    "paper": "磁青金经",
+    "ink": "朱砂墨",
+    "id": "ciqing-cinnabar",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"磁青金经 · 14px\":\n  - generic: 磁青金经 · 14px\n- generic: 1/260\n- generic: 01:58\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 1 笔\":\n    - generic: 1/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"钤印导出\":\n  - generic: 钤印导出\n- button \"笔迹回放\":\n  - generic: 笔迹回放\n- button:\n- generic: 正在回放：「观」\n- generic: 100%\n- slider: \"1\"\n- button \"播放\" [active]:\n  - generic: 播放\n- button \"从头开始\":\n- generic: 倍速：\n- button \"5x\"\n- button \"10x\"\n- button \"20x\""
+  },
+  {
+    "case": "R02",
+    "paper": "磁青金经",
+    "ink": "松烟墨",
+    "id": "ciqing-black",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"磁青金经 · 14px\":\n  - generic: 磁青金经 · 14px\n- generic: 1/260\n- generic: 02:03\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 1 笔\":\n    - generic: 1/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"钤印导出\":\n  - generic: 钤印导出\n- button \"笔迹回放\":\n  - generic: 笔迹回放\n- button:\n- generic: 正在回放：「观」\n- generic: 100%\n- slider: \"1\"\n- button \"播放\" [active]:\n  - generic: 播放\n- button \"从头开始\":\n- generic: 倍速：\n- button \"5x\"\n- button \"10x\"\n- button \"20x\""
+  },
+  {
+    "case": "R02",
+    "paper": "古法宣纸",
+    "ink": "松烟墨",
+    "id": "xuan-black",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"古法宣纸 · 14px\":\n  - generic: 古法宣纸 · 14px\n- generic: 1/260\n- generic: 02:07\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 1 笔\":\n    - generic: 1/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"钤印导出\":\n  - generic: 钤印导出\n- button \"笔迹回放\":\n  - generic: 笔迹回放\n- button:\n- generic: 正在回放：「观」\n- generic: 100%\n- slider: \"1\"\n- button \"播放\" [active]:\n  - generic: 播放\n- button \"从头开始\":\n- generic: 倍速：\n- button \"5x\"\n- button \"10x\"\n- button \"20x\""
+  },
+  {
+    "case": "R02",
+    "paper": "古法宣纸",
+    "ink": "泥金墨",
+    "id": "xuan-gold",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"古法宣纸 · 14px\":\n  - generic: 古法宣纸 · 14px\n- generic: 1/260\n- generic: 02:11\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 1 笔\":\n    - generic: 1/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"钤印导出\":\n  - generic: 钤印导出\n- button \"笔迹回放\":\n  - generic: 笔迹回放\n- button:\n- generic: 正在回放：「观」\n- generic: 100%\n- slider: \"1\"\n- button \"播放\" [active]:\n  - generic: 播放\n- button \"从头开始\":\n- generic: 倍速：\n- button \"5x\"\n- button \"10x\"\n- button \"20x\""
+  },
+  {
+    "case": "R02",
+    "paper": "古法宣纸",
+    "ink": "朱砂墨",
+    "id": "xuan-cinnabar",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"古法宣纸 · 14px\":\n  - generic: 古法宣纸 · 14px\n- generic: 1/260\n- generic: 02:15\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 1 笔\":\n    - generic: 1/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"钤印导出\":\n  - generic: 钤印导出\n- button \"笔迹回放\":\n  - generic: 笔迹回放\n- button:\n- generic: 正在回放：「观」\n- generic: 100%\n- slider: \"1\"\n- button \"播放\" [active]:\n  - generic: 播放\n- button \"从头开始\":\n- generic: 倍速：\n- button \"5x\"\n- button \"10x\"\n- button \"20x\""
+  }
+]

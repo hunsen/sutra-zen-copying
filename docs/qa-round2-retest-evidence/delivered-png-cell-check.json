@@ -1,0 +1,10 @@
+{
+  "method": "按导出引擎的2x字格坐标，取内框140x140，统计RGB最大通道低于90的像素。只辅助区分本张宣纸黑墨样本的深色测试笔迹与浅灰底稿，非通用笔迹识别。",
+  "totalCellsChecked": 260,
+  "cellsWithDarkPixels": [
+    {
+      "charIndexZeroBased": 0,
+      "darkPixelsRgbMaxBelow90": 115
+    }
+  ]
+}

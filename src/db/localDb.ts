@@ -462,9 +462,13 @@ export async function listSessionSummaries(): Promise<SessionSummary[]> {
   return sessions.map((item) => {
     const sutra = sutraMap.get(item.sutraId);
     const totalChars = sutra?.content.length ?? 0;
-    const completedChars = item.writtenChars ? Object.keys(item.writtenChars).length : 0;
+    const completedChars = item.writtenChars
+      ? Object.values(item.writtenChars).filter((c) => (c.strokes?.length ?? 0) > 0).length
+      : 0;
     const isFinished = Boolean(
-      item.completedAt || (totalChars > 0 && completedChars >= totalChars)
+      totalChars > 0 &&
+        completedChars >= totalChars &&
+        (Boolean(item.completedAt) || completedChars === totalChars)
     );
 
     return {

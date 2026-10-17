@@ -1,0 +1,663 @@
+[
+  {
+    "case": "wide1440",
+    "sections": [
+      {
+        "maxHeight": "none",
+        "rect": {
+          "bottom": 892,
+          "height": 836,
+          "left": 16,
+          "right": 998,
+          "top": 56,
+          "width": 982,
+          "x": 16,
+          "y": 56
+        }
+      },
+      {
+        "maxHeight": "none",
+        "rect": {
+          "bottom": 892,
+          "height": 836,
+          "left": 1014,
+          "right": 1424,
+          "top": 56,
+          "width": 410,
+          "x": 1014,
+          "y": 56
+        }
+      }
+    ],
+    "viewport": [
+      1440,
+      900
+    ]
+  },
+  {
+    "case": "draft-before",
+    "at": "2026-10-17T14:50:50.110Z",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"古法宣纸 · 14px\":\n  - generic: 古法宣纸 · 14px\n- generic: 1/260\n- generic: 00:30\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 2 笔\":\n    - generic: 2/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时"
+  },
+  {
+    "case": "brush-wide",
+    "background": "rgba(28, 25, 23, 0.98)",
+    "rect": {
+      "bottom": 467,
+      "height": 202,
+      "left": 1143,
+      "right": 1399,
+      "top": 265,
+      "width": 256,
+      "x": 1143,
+      "y": 265
+    }
+  },
+  {
+    "case": "draft-after-refresh",
+    "elapsedBeforeReloadMs": 46963,
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"古法宣纸 · 14px\":\n  - generic: 古法宣纸 · 14px\n- generic: 1/260\n- generic: 01:16\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 2 笔\":\n    - generic: 2/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✨ 智能字成\":\n    - generic: ✨ 智能字成\n  - generic: 整字写满自动走纸"
+  },
+  {
+    "case": "clear-after-submission-navigation",
+    "at": "2026-10-17T14:51:53.237Z",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"古法宣纸 · 14px\":\n  - generic: 古法宣纸 · 14px\n- generic: 1/260\n- generic: 01:30\n- button \"禅音静音\":\n- button \"钤印导出\":\n  - generic: 钤印导出\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"全景八行 切换\":\n    - generic: 全景八行\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 0 笔\":\n    - generic: 0/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\" [disabled]:\n    - generic: 撤销\n  - button \"重写\" [disabled]:\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✨ 智能字成\":\n    - generic: ✨ 智能字成\n  - generic: 整字写满自动走纸"
+  },
+  {
+    "case": "theme390",
+    "background": "rgba(28, 25, 23, 0.98)",
+    "rect": {
+      "bottom": 378.25,
+      "height": 313.25,
+      "left": 80.921875,
+      "right": 309.0703125,
+      "top": 65,
+      "width": 228.1484375,
+      "x": 80.921875,
+      "y": 65
+    }
+  },
+  {
+    "case": "theme390-inner-overflow",
+    "buttons": [
+      {
+        "rect": {
+          "bottom": 100,
+          "height": 20,
+          "left": 272.921875,
+          "right": 294.0703125,
+          "top": 80,
+          "width": 21.1484375,
+          "x": 272.921875,
+          "y": 80
+        },
+        "text": "✕"
+      },
+      {
+        "rect": {
+          "bottom": 179,
+          "height": 30,
+          "left": 95.921875,
+          "right": 191.9921875,
+          "top": 149,
+          "width": 96.0703125,
+          "x": 95.921875,
+          "y": 149
+        },
+        "text": "古法宣纸"
+      },
+      {
+        "rect": {
+          "bottom": 179,
+          "height": 30,
+          "left": 197.9921875,
+          "right": 294.0703125,
+          "top": 149,
+          "width": 96.078125,
+          "x": 197.9921875,
+          "y": 149
+        },
+        "text": "磁青金经"
+      },
+      {
+        "rect": {
+          "bottom": 215,
+          "height": 30,
+          "left": 95.921875,
+          "right": 191.9921875,
+          "top": 185,
+          "width": 96.0703125,
+          "x": 95.921875,
+          "y": 185
+        },
+        "text": "洒金红笺"
+      },
+      {
+        "rect": {
+          "bottom": 215,
+          "height": 30,
+          "left": 197.9921875,
+          "right": 294.0703125,
+          "top": 185,
+          "width": 96.078125,
+          "x": 197.9921875,
+          "y": 185
+        },
+        "text": "古籍竹纸"
+      },
+      {
+        "rect": {
+          "bottom": 283,
+          "height": 26,
+          "left": 95.921875,
+          "right": 165.921875,
+          "top": 257,
+          "width": 70,
+          "x": 95.921875,
+          "y": 257
+        },
+        "text": "松烟墨"
+      },
+      {
+        "rect": {
+          "bottom": 283,
+          "height": 26,
+          "left": 173.921875,
+          "right": 243.921875,
+          "top": 257,
+          "width": 70,
+          "x": 173.921875,
+          "y": 257
+        },
+        "text": "泥金墨"
+      },
+      {
+        "rect": {
+          "bottom": 283,
+          "height": 26,
+          "left": 251.921875,
+          "right": 321.921875,
+          "top": 257,
+          "width": 70,
+          "x": 251.921875,
+          "y": 257
+        },
+        "text": "朱砂墨"
+      },
+      {
+        "rect": {
+          "bottom": 363.25,
+          "height": 45.75,
+          "left": 95.921875,
+          "right": 142.453125,
+          "top": 317.5,
+          "width": 46.53125,
+          "x": 95.921875,
+          "y": 317.5
+        },
+        "text": "小楷9px"
+      },
+      {
+        "rect": {
+          "bottom": 363.25,
+          "height": 45.75,
+          "left": 146.453125,
+          "right": 192.9921875,
+          "top": 317.5,
+          "width": 46.5390625,
+          "x": 146.453125,
+          "y": 317.5
+        },
+        "text": "中楷14px"
+      },
+      {
+        "rect": {
+          "bottom": 363.25,
+          "height": 45.75,
+          "left": 196.9921875,
+          "right": 243.53125,
+          "top": 317.5,
+          "width": 46.5390625,
+          "x": 196.9921875,
+          "y": 317.5
+        },
+        "text": "大楷20px"
+      },
+      {
+        "rect": {
+          "bottom": 363.25,
+          "height": 45.75,
+          "left": 247.53125,
+          "right": 294.0703125,
+          "top": 317.5,
+          "width": 46.5390625,
+          "x": 247.53125,
+          "y": 317.5
+        },
+        "text": "榜书26px"
+      }
+    ],
+    "clientWidth": 226,
+    "rect": {
+      "bottom": 378.25,
+      "height": 313.25,
+      "left": 80.921875,
+      "right": 309.0703125,
+      "top": 65,
+      "width": 228.1484375,
+      "x": 80.921875,
+      "y": 65
+    },
+    "scrollLeft": 0,
+    "scrollWidth": 240
+  },
+  {
+    "case": "clear-after-refresh",
+    "snapshot": "- button \"般若波罗蜜多心经\":\n  - generic: 般若波罗蜜多心经\n- button \"选择纸张古笺、墨色与笔触粗细\":\n- generic: 1/260\n- button \"禅音静音\":\n- button \"钤印落款与长卷高清导出\":\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"大字模式 (3行) 切换\":\n    - generic: 大字模式 (3行)\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 第 1/260\n  - generic: 「观」\n  - generic \"当前字标准笔画约 6 笔，已书写 0 笔\":\n    - generic: 0/6笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\" [disabled]:\n    - generic: 撤销\n  - button \"重写\" [disabled]:\n    - generic: 重写\n  - button \"回到上一字\" [disabled]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✨ 智能字成\":\n    - generic: ✨ 智能字成\n  - generic: 整字写满自动走纸"
+  },
+  {
+    "case": "three-char-skip-middle",
+    "snapshot": "- button \"独立复验一二三\":\n  - generic: 独立复验一二三\n- button \"选择纸张古笺、墨色与笔触粗细\":\n- generic: 3/3\n- button \"禅音静音\":\n- button \"钤印落款与长卷高清导出\":\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"大字模式 (3行) 切换\":\n    - generic: 大字模式 (3行)\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 第 3/3\n  - generic: 「三」\n  - generic \"当前字标准笔画约 3 笔，已书写 1 笔\":\n    - generic: 1/3笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\":\n  - button \"圆满结卷\":\n    - generic: 圆满结卷\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"藏经阁\":\n  - generic: 藏经阁\n- button \"功德簿\" [active]:\n  - generic: 功德簿\n- button:\n- generic: 累计敬写汉字\n- text: \"2\"\n- generic: 字\n- generic: 累计静心修持\n- text: \"3\"\n- generic: 分钟\n- generic: 圆满长卷经部\n- text: \"0\"\n- generic: 部\n- heading \"历史抄经功德画廊\" [level=3]\n- generic \"磁青金经\"\n- heading \"独立复验一二三\" [level=4]\n- generic: 进度：2/3 字\n- generic: ·\n- text: 0 分钟\n- generic: 进入\n- button \"删除记录\":\n- generic \"磁青金经\"\n- heading \"般若波罗蜜多心经\" [level=4]\n- generic: 进度：0/260 字\n- generic: ·\n- text: 2 分钟\n- generic: 进入\n- button \"删除记录\":"
+  },
+  {
+    "case": "three-char-complete-export-open",
+    "at": "2026-10-17T14:53:32.805Z",
+    "snapshot": "- button \"独立复验一二三\":\n  - generic: 独立复验一二三\n- button \"选择纸张古笺、墨色与笔触粗细\":\n- generic: 3/3\n- button \"禅音静音\":\n- button \"钤印落款与长卷高清导出\":\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"大字模式 (3行) 切换\":\n    - generic: 大字模式 (3行)\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 第 3/3\n  - generic: 「三」\n  - generic \"当前字标准笔画约 3 笔，已书写 1 笔\":\n    - generic: 1/3笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\":\n  - button \"圆满结卷\" [active]:\n    - generic: 圆满结卷\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"钤印导出\":\n  - generic: 钤印导出\n- button \"笔迹回放\":\n  - generic: 笔迹回放\n- button:\n- generic: 印章实景预览\n- generic: 篆刻印文（2~4字，如姓名、静心、欢喜）\n- textbox \"静心\"\n- generic: 印章风格\n- radio \"白文（阴刻·红底白字，推荐）\" [checked]\n- generic: 白文（阴刻·红底白字，推荐）\n- radio \"朱文（阳刻·纸底红字）\"\n- generic: 朱文（阳刻·纸底红字）\n- generic: 卷尾发愿回向文\n- textbox: 愿以此功德，普及于一切，我等与众生，皆共成佛道。\n- generic: 常用模板：\n- button \"愿以此功德，普及于一切，我等与众生，皆共成佛道。\"\n- button \"愿消三障诸烦恼，愿得智慧真明了，普愿罪障悉消除，世世常行菩萨道。\"\n- button \"文殊师利勇猛智，普贤慧行亦复然，我今回向诸善根，随彼一切常修学。\"\n- button \"心如工画师，能画诸世间，五蕴悉从生，无法而不造。\"\n- button \"诸行无常，是生灭法，生灭灭已，寂灭为乐。\"\n- generic: 长卷尺寸：超清装裱画幅（2x 缩放，内含乌丝栏与全部矢量笔迹）\n- button \"下载装裱长卷 PNG\":\n  - generic: 下载装裱长卷 PNG"
+  },
+  {
+    "case": "png-download",
+    "error": "Error: Timed out after 8000ms waiting for download."
+  },
+  {
+    "case": "complete-after-multiple-saves",
+    "elapsedMs": 357236,
+    "snapshot": "- button \"独立复验一二三\":\n  - generic: 独立复验一二三\n- button \"选择纸张古笺、墨色与笔触粗细\":\n- generic: 3/3\n- button \"禅音静音\":\n- button \"钤印落款与长卷高清导出\":\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"大字模式 (3行) 切换\":\n    - generic: 大字模式 (3行)\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 第 3/3\n  - generic: 「三」\n  - generic \"当前字标准笔画约 3 笔，已书写 1 笔\":\n    - generic: 1/3笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\":\n  - button \"圆满结卷\":\n    - generic: 圆满结卷\n  - button \"✍️ 手动点击\":\n    - generic: ✍️ 手动点击\n  - generic: 自由书写不限时\n- button \"藏经阁\":\n  - generic: 藏经阁\n- button \"功德簿\" [active]:\n  - generic: 功德簿\n- button:\n- generic: 累计敬写汉字\n- text: \"3\"\n- generic: 字\n- generic: 累计静心修持\n- text: \"9\"\n- generic: 分钟\n- generic: 圆满长卷经部\n- text: \"1\"\n- generic: 部\n- heading \"历史抄经功德画廊\" [level=3]\n- generic \"磁青金经\"\n- heading \"独立复验一二三\" [level=4]\n- generic: 已圆满\n- generic: 进度：3/3 字\n- generic: ·\n- text: 7 分钟\n- generic: 进入\n- button \"删除记录\":\n- generic \"磁青金经\"\n- heading \"般若波罗蜜多心经\" [level=4]\n- generic: 进度：0/260 字\n- generic: ·\n- text: 2 分钟\n- generic: 进入\n- button \"删除记录\":"
+  },
+  {
+    "case": "complete-after-refresh",
+    "snapshot": "- button \"独立复验一二三\":\n  - generic: 独立复验一二三\n- button \"选择纸张古笺、墨色与笔触粗细\":\n- generic: 3/3\n- button \"禅音静音\":\n- button \"钤印落款与长卷高清导出\":\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"大字模式 (3行) 切换\":\n    - generic: 大字模式 (3行)\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 第 3/3\n  - generic: 「三」\n  - generic \"当前字标准笔画约 3 笔，已书写 1 笔\":\n    - generic: 1/3笔\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"14px\":\n    - generic: 14px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\":\n  - button \"圆满结卷\":\n    - generic: 圆满结卷\n  - button \"✨ 智能字成\":\n    - generic: ✨ 智能字成\n  - generic: 整字写满自动走纸\n- button \"藏经阁\":\n  - generic: 藏经阁\n- button \"功德簿\" [active]:\n  - generic: 功德簿\n- button:\n- generic: 累计敬写汉字\n- text: \"3\"\n- generic: 字\n- generic: 累计静心修持\n- text: \"9\"\n- generic: 分钟\n- generic: 圆满长卷经部\n- text: \"1\"\n- generic: 部\n- heading \"历史抄经功德画廊\" [level=3]\n- generic \"磁青金经\"\n- heading \"独立复验一二三\" [level=4]\n- generic: 已圆满\n- generic: 进度：3/3 字\n- generic: ·\n- text: 7 分钟\n- generic: 进入\n- button \"删除记录\":\n- generic \"磁青金经\"\n- heading \"般若波罗蜜多心经\" [level=4]\n- generic: 进度：0/260 字\n- generic: ·\n- text: 2 分钟\n- generic: 进入\n- button \"删除记录\":"
+  },
+  {
+    "case": "small320",
+    "rect": {
+      "bottom": 549.8359375,
+      "height": 21,
+      "left": 18,
+      "right": 101.5,
+      "top": 528.8359375,
+      "width": 83.5,
+      "x": 18,
+      "y": 528.8359375
+    },
+    "viewport": [
+      320,
+      568
+    ]
+  },
+  {
+    "case": "landscape844",
+    "header": {
+      "bottom": 58,
+      "height": 46,
+      "left": 140.1796875,
+      "right": 703.8125,
+      "top": 12,
+      "width": 563.6328125,
+      "x": 140.1796875,
+      "y": 12
+    },
+    "sections": [
+      {
+        "clientHeight": 324,
+        "rect": {
+          "bottom": 382,
+          "height": 326,
+          "left": 16,
+          "right": 402,
+          "top": 56,
+          "width": 386,
+          "x": 16,
+          "y": 56
+        },
+        "scrollHeight": 324
+      },
+      {
+        "clientHeight": 326,
+        "rect": {
+          "bottom": 382,
+          "height": 326,
+          "left": 418,
+          "right": 828,
+          "top": 56,
+          "width": 410,
+          "x": 418,
+          "y": 56
+        },
+        "scrollHeight": 369
+      }
+    ],
+    "viewport": [
+      844,
+      390
+    ]
+  },
+  {
+    "case": "advance844",
+    "background": "rgba(28, 25, 23, 0.98)",
+    "buttons": [
+      {
+        "rect": {
+          "bottom": 78,
+          "height": 20,
+          "left": 549.8515625,
+          "right": 567,
+          "top": 58,
+          "width": 17.1484375,
+          "x": 549.8515625,
+          "y": 58
+        },
+        "text": "✕"
+      },
+      {
+        "rect": {
+          "bottom": 159,
+          "height": 68,
+          "left": 277,
+          "right": 567,
+          "top": 91,
+          "width": 290,
+          "x": 277,
+          "y": 91
+        },
+        "text": "✨ 智能字成走纸 (推荐)自动感知汉字标准笔画数（当前字 3 笔），写完全部笔画后才走纸，笔画间绝不抢跑。"
+      },
+      {
+        "rect": {
+          "bottom": 235,
+          "height": 68,
+          "left": 277,
+          "right": 567,
+          "top": 167,
+          "width": 290,
+          "x": 277,
+          "y": 167
+        },
+        "text": "✍️ 手动点击走纸完全无倒计时催促，写完本字后手动点击 [写完走纸] 按钮。"
+      },
+      {
+        "rect": {
+          "bottom": 295,
+          "height": 52,
+          "left": 277,
+          "right": 567,
+          "top": 243,
+          "width": 290,
+          "x": 277,
+          "y": 243
+        },
+        "text": "⏱️ 纯延时走纸只要抬笔就启动倒计时，适合单笔练习。"
+      },
+      {
+        "rect": {
+          "bottom": 332,
+          "height": 20,
+          "left": 418.03125,
+          "right": 450.7734375,
+          "top": 312,
+          "width": 32.7421875,
+          "x": 418.03125,
+          "y": 312
+        },
+        "text": "1.0s"
+      },
+      {
+        "rect": {
+          "bottom": 332,
+          "height": 20,
+          "left": 456.7734375,
+          "right": 489.515625,
+          "top": 312,
+          "width": 32.7421875,
+          "x": 456.7734375,
+          "y": 312
+        },
+        "text": "1.5s"
+      },
+      {
+        "rect": {
+          "bottom": 332,
+          "height": 20,
+          "left": 495.515625,
+          "right": 528.2578125,
+          "top": 312,
+          "width": 32.7421875,
+          "x": 495.515625,
+          "y": 312
+        },
+        "text": "2.0s"
+      },
+      {
+        "rect": {
+          "bottom": 332,
+          "height": 20,
+          "left": 534.2578125,
+          "right": 567,
+          "top": 312,
+          "width": 32.7421875,
+          "x": 534.2578125,
+          "y": 312
+        },
+        "text": "3.0s"
+      }
+    ],
+    "clientHeight": 302,
+    "rect": {
+      "bottom": 347,
+      "height": 304,
+      "left": 262,
+      "right": 582,
+      "top": 43,
+      "width": 320,
+      "x": 262,
+      "y": 43
+    },
+    "scrollHeight": 302
+  },
+  {
+    "case": "tablet768",
+    "header": {
+      "bottom": 58,
+      "height": 46,
+      "left": 102.1796875,
+      "right": 665.8125,
+      "top": 12,
+      "width": 563.6328125,
+      "x": 102.1796875,
+      "y": 12
+    },
+    "viewport": [
+      768,
+      1024
+    ]
+  },
+  {
+    "case": "wide1920",
+    "sections": [
+      {
+        "maxHeight": "none",
+        "rect": {
+          "bottom": 1072,
+          "height": 1016,
+          "left": 16,
+          "right": 1478,
+          "top": 56,
+          "width": 1462,
+          "x": 16,
+          "y": 56
+        }
+      },
+      {
+        "maxHeight": "none",
+        "rect": {
+          "bottom": 1072,
+          "height": 1016,
+          "left": 1494,
+          "right": 1904,
+          "top": 56,
+          "width": 410,
+          "x": 1494,
+          "y": 56
+        }
+      }
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "case": "theme-containing-block-ancestors",
+    "ancestors": [
+      {
+        "backdropFilter": "none",
+        "className": "fixed inset-x-3 top-14 mx-auto w-auto max-w-xs sm:absolute sm:inset-x-auto sm:top-full sm:left-1/2 sm:-translate-x-1/2 sm:mt-2 sm:w-72 p-3.5 bg-stone-900 border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-3 font-serif max-h-[calc(100vh-80px)] overflow-y-auto no-scrollbar animate-fade-in",
+        "position": "fixed",
+        "rect": {
+          "bottom": 378.25,
+          "height": 313.25,
+          "left": 86.0859375,
+          "right": 303.9140625,
+          "top": 65,
+          "width": 217.828125,
+          "x": 86.0859375,
+          "y": 65
+        },
+        "tag": "DIV",
+        "transform": "none"
+      },
+      {
+        "backdropFilter": "none",
+        "className": "relative flex-shrink-0",
+        "position": "relative",
+        "rect": {
+          "bottom": 32.5,
+          "height": 17,
+          "left": 195.0859375,
+          "right": 220.0859375,
+          "top": 15.5,
+          "width": 25,
+          "x": 195.0859375,
+          "y": 15.5
+        },
+        "tag": "DIV",
+        "transform": "none"
+      },
+      {
+        "backdropFilter": "blur(24px)",
+        "className": "flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-stone-900/90 hover:bg-stone-900/95 backdrop-blur-xl border border-stone-700/60 shadow-2xl rounded-full text-stone-200 transition-colors whitespace-nowrap flex-nowrap",
+        "position": "static",
+        "rect": {
+          "bottom": 40,
+          "height": 32,
+          "left": 73.0859375,
+          "right": 316.9140625,
+          "top": 8,
+          "width": 243.828125,
+          "x": 73.0859375,
+          "y": 8
+        },
+        "tag": "DIV",
+        "transform": "none"
+      },
+      {
+        "backdropFilter": "none",
+        "className": "fixed top-2 sm:top-3 inset-x-0 mx-auto w-fit max-w-[96vw] z-50 transition-opacity duration-300 opacity-100",
+        "position": "fixed",
+        "rect": {
+          "bottom": 40,
+          "height": 32,
+          "left": 73.0859375,
+          "right": 316.9140625,
+          "top": 8,
+          "width": 243.828125,
+          "x": 73.0859375,
+          "y": 8
+        },
+        "tag": "DIV",
+        "transform": "none"
+      },
+      {
+        "backdropFilter": "none",
+        "className": "relative w-screen h-screen overflow-hidden flex flex-col font-serif select-none transition-colors duration-700",
+        "position": "relative",
+        "rect": {
+          "bottom": 844,
+          "height": 844,
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "width": 390,
+          "x": 0,
+          "y": 0
+        },
+        "tag": "DIV",
+        "transform": "none"
+      },
+      {
+        "backdropFilter": "none",
+        "className": "",
+        "position": "static",
+        "rect": {
+          "bottom": 844,
+          "height": 844,
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "width": 390,
+          "x": 0,
+          "y": 0
+        },
+        "tag": "DIV",
+        "transform": "none"
+      },
+      {
+        "backdropFilter": "none",
+        "className": "bg-[#1A1918] overflow-hidden select-none",
+        "position": "static",
+        "rect": {
+          "bottom": 844,
+          "height": 844,
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "width": 390,
+          "x": 0,
+          "y": 0
+        },
+        "tag": "BODY",
+        "transform": "none"
+      },
+      {
+        "backdropFilter": "none",
+        "className": "",
+        "position": "static",
+        "rect": {
+          "bottom": 844,
+          "height": 844,
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "width": 390,
+          "x": 0,
+          "y": 0
+        },
+        "tag": "HTML",
+        "transform": "none"
+      }
+    ]
+  },
+  {
+    "case": "offline-server-stopped-reload-prev",
+    "snapshot": "- button \"独立复验一二三\":\n  - generic: 独立复验一二三\n- button \"选择纸张古笺、墨色与笔触粗细\":\n- generic: 2/3\n- button \"禅音静音\":\n- button \"钤印落款与长卷高清导出\":\n- main:\n  - button \"全屏长卷\":\n    - generic: 全屏长卷\n  - button \"大字模式 (3行) 切换\":\n    - generic: 大字模式 (3行)\n    - generic: 切换\n  - button \"缩小卷轴\":\n  - button \"100%\"\n  - button \"放大卷轴\":\n  - generic: 第 2/3\n  - generic: 「二」\n  - generic \"当前字标准笔画约 2 笔，已书写 2 笔\":\n    - generic: 圆满 (2/2)\n  - button \"隐藏底稿字模\":\n  - slider \"调节底稿浓度\": \"0.36\"\n  - button \"26px\":\n    - generic: 26px\n  - button \"撤销\":\n    - generic: 撤销\n  - button \"重写\":\n    - generic: 重写\n  - button \"回到上一字\" [active]:\n  - button \"写完走纸\":\n    - generic: 写完走纸\n  - button \"✨ 智能字成\":\n    - generic: ✨ 智能字成\n  - generic: 整字写满自动走纸"
+  }
+]

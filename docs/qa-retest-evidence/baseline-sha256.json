@@ -1,0 +1,13 @@
+{
+  "src/App.tsx": "c1d32a2cb18ade8ac4280dde53af37a3ce037d593d29cc3613d5bee839751869",
+  "src/components/SealAndExportModal.tsx": "e7d092159a5be6f869bc2c5cc798029eff63904ed7b7e52ad431674e861786e7",
+  "src/components/TopZenCapsule.tsx": "d1cb98d96f3ad7a0cdbe4a36ed7434999d77c571af4ec929a7129befc66ea04f",
+  "src/components/ZoomWritingPad.tsx": "0e7f2fc8ef9161381eac82db7113da4b2dc50f0b34dc88c687aa449199bcd9a6",
+  "src/db/localDb.ts": "c2e264c7eaa0d77ce1902626f7161d8ef4ae212399ec8ade2845e6fe6d5c834a",
+  "tailwind.config.js": "f65b3020dfe32aa49bc3108967ae42bbc5d70dc646de31a40a81ee0bb7be5a40",
+  "vite.config.ts": "6406d5b75a9c92ee2b8ca639aeb0a6a877c87829ef5049e2dcc1d5ee47b35110",
+  "tests/regression.test.mjs": "e671a8da62fa3d902064ea8f2580a4a01cc31c8a9d2da16f6ba434d896fbfa66",
+  "scripts/verify-all-qa.mjs": "d209b2bbbc58e328ff22a8b266da465b7600b94bfd6537d4dac1a800961f9ec8",
+  "public/pwa-192x192.png": "b6a0284e59e8b355eec39bb736d58efcde464a9e3384ea00b306f580e1c628d0",
+  "public/pwa-512x512.png": "c0a0bdf332a9a2fa895bd5364c702ad918460089da824f4d1258f7e01179a9e5"
+}
