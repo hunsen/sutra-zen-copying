@@ -9,6 +9,7 @@
 // ============================================================================
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { ZoomIn, ZoomOut } from 'lucide-react';
 import {
   WrittenCharRecord,
   BrushStroke,
@@ -75,8 +76,10 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
   const scrollXRef = useRef(0);
   scrollXRef.current = scrollX;
 
-  // 用户手动选择的排版模式：'auto'（自动感知高度）| 'large'（大字横卷 2~3 行）| 'classic'（经典全景 8 行）
+  // 用户手动选择的排版模式：'auto'（自动感知高度）| 'large'（大字横卷 2~4 行）| 'classic'（经典全景 8 行）
   const [layoutMode, setLayoutMode] = useState<'auto' | 'large' | 'classic'>('auto');
+  // 用户自选缩放乘数 (0.7x ~ 2.0x)
+  const [zoomMultiplier, setZoomMultiplier] = useState<number>(1.0);
 
   // 计算当前有效每列行数
   const effectiveCharsPerColumn = useMemo(() => {
@@ -84,7 +87,9 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       return charsPerColumn;
     }
     if (layoutMode === 'large') {
-      return containerHeight < 175 ? 2 : 3;
+      if (containerHeight < 175) return 2;
+      if (containerHeight < 360) return 3;
+      return 4; // 宽屏大字模式：4 行超大书法临摹字格
     }
     if (layoutMode === 'classic') {
       return 8;
@@ -100,13 +105,13 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
   }, [charsPerColumn, containerHeight, layoutMode]);
 
   // 边距与标头尺寸根据行数动态微调
-  const isCompactMode = effectiveCharsPerColumn <= 3;
-  const MARGIN_TOP = isCompactMode ? 16 : 40;
-  const MARGIN_BOTTOM = isCompactMode ? 16 : 40;
-  const MARGIN_RIGHT = isCompactMode ? 28 : 45;
-  const MARGIN_LEFT = isCompactMode ? 36 : 60;
-  const HEADER_WIDTH = isCompactMode ? (effectiveCharsPerColumn <= 2 ? 96 : 110) : 130;
-  const TAIL_WIDTH = isCompactMode ? (effectiveCharsPerColumn <= 2 ? 110 : 125) : 140;
+  const isCompactMode = effectiveCharsPerColumn <= 4;
+  const MARGIN_TOP = isCompactMode ? 18 : 40;
+  const MARGIN_BOTTOM = isCompactMode ? 18 : 40;
+  const MARGIN_RIGHT = isCompactMode ? 30 : 45;
+  const MARGIN_LEFT = isCompactMode ? 40 : 60;
+  const HEADER_WIDTH = isCompactMode ? (effectiveCharsPerColumn <= 2 ? 96 : 115) : 130;
+  const TAIL_WIDTH = isCompactMode ? (effectiveCharsPerColumn <= 2 ? 110 : 130) : 140;
 
   // 几何计算
   const totalChars = content.length;
@@ -119,9 +124,13 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     TAIL_WIDTH +
     MARGIN_LEFT;
 
-  // 自适应纵向缩放比例（保证字画卷在视口中完整垂直居中显示）
-  const displayHeight = Math.max(90, Math.min(scrollTotalHeight, containerHeight - 8));
-  const displayScale = displayHeight / scrollTotalHeight;
+  // 自适应纵向缩放比例：宽屏下突破固定高度限制，撑满可用容器高度，并叠加缩放乘数
+  const baseAvailableHeight = Math.max(90, containerHeight - 16);
+  const baseDisplayHeight = Math.min(scrollTotalHeight * 1.65, baseAvailableHeight);
+  const baseScale = baseDisplayHeight / scrollTotalHeight;
+  const displayScale = baseScale * zoomMultiplier;
+
+  const displayHeight = Math.round(scrollTotalHeight * displayScale);
   const displayWidth = Math.round(scrollTotalWidth * displayScale);
 
   // 拖拽手势交互
@@ -552,23 +561,52 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
-      {/* 排版模式切换快捷悬浮胶囊 */}
-      <div className="absolute top-2 left-2 z-20 flex items-center bg-stone-900/80 hover:bg-stone-800/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-stone-700/60 shadow-md transition-all">
+      {/* 排版模式与缩放快捷悬浮胶囊 */}
+      <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5 bg-stone-900/85 hover:bg-stone-900/95 backdrop-blur-md px-2.5 py-1 rounded-full border border-stone-700/60 shadow-md transition-all">
+        {/* 排版模式切换 */}
         <button
           type="button"
           onClick={() => {
             setLayoutMode((prev) => {
-              if (prev === 'auto') return effectiveCharsPerColumn <= 3 ? 'classic' : 'large';
+              if (prev === 'auto') return effectiveCharsPerColumn <= 4 ? 'classic' : 'large';
               if (prev === 'large') return 'classic';
               return 'large';
             });
           }}
-          className="text-[10px] sm:text-[11px] font-serif text-amber-200/90 hover:text-amber-100 flex items-center gap-1 active:scale-95"
+          className="text-[10px] sm:text-[11px] font-serif text-amber-200/90 hover:text-amber-100 flex items-center gap-1 active:scale-95 pr-1.5 border-r border-stone-700/50"
           title="切换卷轴排版：大字模式 / 全景八行"
         >
-          <span>{effectiveCharsPerColumn <= 3 ? `大字模式 (${effectiveCharsPerColumn}行)` : '全景八行'}</span>
+          <span>{effectiveCharsPerColumn <= 4 ? `大字模式 (${effectiveCharsPerColumn}行)` : '全景八行'}</span>
           <span className="text-[9px] text-stone-400">切换</span>
         </button>
+
+        {/* 缩放按钮 */}
+        <div className="flex items-center gap-0.5 text-stone-300">
+          <button
+            type="button"
+            onClick={() => setZoomMultiplier((z) => Math.max(0.6, Math.round((z - 0.15) * 100) / 100))}
+            className="p-1 hover:text-amber-200 active:scale-90 transition-transform"
+            title="缩小卷轴"
+          >
+            <ZoomOut size={12} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setZoomMultiplier(1.0)}
+            className="text-[10px] px-1 font-mono hover:text-amber-200 transition-colors"
+            title="恢复 100% 默认缩放"
+          >
+            {Math.round(zoomMultiplier * 100)}%
+          </button>
+          <button
+            type="button"
+            onClick={() => setZoomMultiplier((z) => Math.min(2.2, Math.round((z + 0.15) * 100) / 100))}
+            className="p-1 hover:text-amber-200 active:scale-90 transition-transform"
+            title="放大卷轴"
+          >
+            <ZoomIn size={12} />
+          </button>
+        </div>
       </div>
 
       {/* 滚动容器 */}
@@ -579,7 +617,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         onScroll={handleScroll}
-        className="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing no-scrollbar touch-pan-x flex items-center"
+        className="w-full h-full overflow-x-auto overflow-y-auto cursor-grab active:cursor-grabbing no-scrollbar touch-pan-x touch-pan-y flex items-center"
         style={{ scrollBehavior: 'auto' }}
       >
         <div

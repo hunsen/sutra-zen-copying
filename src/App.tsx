@@ -412,34 +412,34 @@ export const App: React.FC = () => {
 
       {/* 主工作区：响应式双区联动布局（适配移动端横竖屏与桌面/平板双模式） */}
       <main className="w-full h-full flex flex-col landscape:flex-row lg:flex-row pt-12 sm:pt-14 pb-1 sm:pb-2 px-1.5 sm:px-4 gap-1.5 sm:gap-4 overflow-hidden">
-        {/* 左区：竖排从右至左全景手卷预览与浏览区（大屏占宽 60%，手机端自适应折叠展开） */}
+        {/* 左区：竖排从右至左全景手卷预览与浏览区（宽屏下占满全部剩余宽度，全屏模式下占满 100%） */}
         <section
           className={`relative rounded-xl sm:rounded-2xl overflow-hidden border border-stone-800/20 shadow-inner flex items-center justify-center p-1 sm:p-2 transition-all duration-300 ${
             isScrollExpandedMobile
               ? 'flex-1 w-full h-full'
-              : 'flex-none h-[26vh] min-h-[145px] max-h-[200px] landscape:h-full landscape:flex-1 landscape:w-[58%] lg:h-full lg:flex-1 lg:w-[60%]'
+              : 'flex-none h-[26vh] min-h-[145px] max-h-[200px] landscape:h-full landscape:flex-1 landscape:w-auto lg:h-full lg:flex-1 lg:w-auto'
           }`}
           style={{
             background:
               'radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.05) 100%)',
           }}
         >
-          {/* 手机竖屏模式下的展开长卷/返回书写快捷胶囊 */}
+          {/* 全屏展开长卷 / 返回临摹快捷胶囊（全设备通用） */}
           <button
             type="button"
             onClick={() => setIsScrollExpandedMobile(!isScrollExpandedMobile)}
-            className="lg:hidden landscape:hidden absolute top-2 right-2 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full bg-stone-900/85 hover:bg-stone-800 backdrop-blur-md border border-stone-700/60 text-[11px] font-serif text-amber-200 transition-all active:scale-95 shadow-md"
+            className="absolute top-2 right-2 z-20 flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-stone-900/85 hover:bg-stone-800 backdrop-blur-md border border-stone-700/60 text-[11px] sm:text-xs font-serif text-amber-200 hover:text-amber-100 transition-all active:scale-95 shadow-md"
             title={isScrollExpandedMobile ? '收起长卷，返回书写台' : '全屏展开浏览整篇长卷'}
           >
             {isScrollExpandedMobile ? (
               <>
-                <Minimize2 size={12} />
+                <Minimize2 size={13} />
                 <span>返回临摹</span>
               </>
             ) : (
               <>
-                <Maximize2 size={12} />
-                <span>展开长卷</span>
+                <Maximize2 size={13} />
+                <span>全屏长卷</span>
               </>
             )}
           </button>
@@ -465,12 +465,12 @@ export const App: React.FC = () => {
           />
         </section>
 
-        {/* 右区：黄金落笔区——手指专属放大米字格书写台（大屏占宽 40%，手机端自适应撑满可用高度） */}
+        {/* 右区：黄金落笔区——手指专属放大米字格书写台（宽屏下紧凑停靠 ~410px，留出最大区域给长卷） */}
         <section
           className={`flex flex-col items-center justify-center relative p-1 sm:p-4 overflow-hidden transition-all duration-300 ${
             isScrollExpandedMobile
               ? 'hidden'
-              : 'flex-1 min-h-0 landscape:w-[42%] landscape:h-full lg:w-[40%] lg:h-full'
+              : 'flex-1 min-h-0 landscape:h-full landscape:flex-none landscape:w-[410px] xl:w-[440px] lg:h-full lg:flex-none lg:w-[420px]'
           }`}
         >
           <ZoomWritingPad
