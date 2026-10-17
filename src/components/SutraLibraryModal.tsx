@@ -139,87 +139,87 @@ export const SutraLibraryModal: React.FC<SutraLibraryModalProps> = ({
   const completedCount = summaries.filter((item) => item.isFinished).length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in font-serif select-none">
-      <div className="relative w-full max-w-3xl bg-stone-900 border border-stone-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2.5 sm:p-4 animate-fade-in font-serif select-none">
+      <div className="relative w-full max-w-3xl bg-stone-900 border border-stone-700/80 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-200">
         {/* 顶部标签切换 */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-stone-800">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between px-3.5 sm:px-6 pt-3.5 sm:pt-5 pb-2.5 sm:pb-3 border-b border-stone-800">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <button
               type="button"
               onClick={() => setActiveTab('library')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'library'
                   ? 'bg-amber-900/60 text-amber-200 border border-amber-700/50'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              <BookOpen size={16} />
-              <span>藏经阁 (经典与字帖)</span>
+              <BookOpen size={14} />
+              <span>藏经阁<span className="hidden sm:inline"> (经典与字帖)</span></span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('records')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'records'
                   ? 'bg-amber-900/60 text-amber-200 border border-amber-700/50'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              <Award size={16} />
-              <span>功德簿 (统计与画廊)</span>
+              <Award size={14} />
+              <span>功德簿<span className="hidden sm:inline"> (统计与画廊)</span></span>
             </button>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
+            className="p-1 sm:p-1.5 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* 主体视窗 */}
-        <div className="p-6 overflow-y-auto max-h-[75vh]">
+        <div className="p-3.5 sm:p-6 overflow-y-auto max-h-[80vh]">
           {activeTab === 'library' ? (
             <div className="flex flex-col gap-6">
               {/* 内置名篇经卷 */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-amber-400 tracking-wider">
+                  <h3 className="text-xs sm:text-sm font-medium text-amber-400 tracking-wider">
                     内置传世经典
                   </h3>
                   <button
                     type="button"
                     onClick={() => setIsCreatingCustom(!isCreatingCustom)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-900/40 hover:bg-amber-800 text-amber-200 text-xs border border-amber-700/50 transition-all active:scale-95"
+                    className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-amber-900/40 hover:bg-amber-800 text-amber-200 text-xs border border-amber-700/50 transition-all active:scale-95"
                   >
-                    <Plus size={14} />
+                    <Plus size={13} />
                     <span>自建新字帖</span>
                   </button>
                 </div>
 
                 {/* 自建字帖折叠表单 */}
                 {isCreatingCustom && (
-                  <div className="p-4 mb-4 bg-stone-800/60 rounded-2xl border border-amber-900/30 flex flex-col gap-3 animate-fade-in">
+                  <div className="p-3.5 sm:p-4 mb-4 bg-stone-800/60 rounded-xl sm:rounded-2xl border border-amber-900/30 flex flex-col gap-2.5 sm:gap-3 animate-fade-in">
                     <span className="text-xs font-medium text-amber-300">
                       录入任意古诗词、座右铭或家训文本
                     </span>
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                       <input
                         type="text"
                         placeholder="经卷标题（如：陋室铭）"
                         value={customTitle}
                         onChange={(e) => setCustomTitle(e.target.value)}
-                        className="flex-1 bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:border-amber-600 font-serif"
+                        className="w-full sm:flex-1 bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:border-amber-600 font-serif"
                       />
                       <input
                         type="text"
                         placeholder="作者/出处（如：唐·刘禹锡）"
                         value={customAuthor}
                         onChange={(e) => setCustomAuthor(e.target.value)}
-                        className="w-1/3 bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:border-amber-600 font-serif"
+                        className="w-full sm:w-1/3 bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:border-amber-600 font-serif"
                       />
                     </div>
                     <textarea
@@ -365,29 +365,29 @@ export const SutraLibraryModal: React.FC<SutraLibraryModalProps> = ({
             /* 功德簿统计与历史会话 */
             <div className="flex flex-col gap-6">
               {/* 核心指标统计卡片 */}
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="p-4 bg-stone-800/50 rounded-2xl border border-stone-700/50">
-                  <span className="text-xs text-stone-400 block mb-1">累计敬写汉字</span>
-                  <span className="text-2xl sm:text-3xl font-bold font-mono text-amber-300">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
+                <div className="p-2 sm:p-4 bg-stone-800/50 rounded-xl sm:rounded-2xl border border-stone-700/50">
+                  <span className="text-[10px] sm:text-xs text-stone-400 block mb-0.5 sm:mb-1 whitespace-nowrap truncate">累计敬写汉字</span>
+                  <span className="text-xl sm:text-3xl font-bold font-mono text-amber-300">
                     {totalCharactersWritten}
                   </span>
-                  <span className="text-xs text-stone-500 block mt-0.5">字</span>
+                  <span className="text-[10px] sm:text-xs text-stone-500 block mt-0.5">字</span>
                 </div>
 
-                <div className="p-4 bg-stone-800/50 rounded-2xl border border-stone-700/50">
-                  <span className="text-xs text-stone-400 block mb-1">累计静心修持</span>
-                  <span className="text-2xl sm:text-3xl font-bold font-mono text-amber-300">
+                <div className="p-2 sm:p-4 bg-stone-800/50 rounded-xl sm:rounded-2xl border border-stone-700/50">
+                  <span className="text-[10px] sm:text-xs text-stone-400 block mb-0.5 sm:mb-1 whitespace-nowrap truncate">累计静心修持</span>
+                  <span className="text-xl sm:text-3xl font-bold font-mono text-amber-300">
                     {totalDurationMinutes}
                   </span>
-                  <span className="text-xs text-stone-500 block mt-0.5">分钟</span>
+                  <span className="text-[10px] sm:text-xs text-stone-500 block mt-0.5">分钟</span>
                 </div>
 
-                <div className="p-4 bg-stone-800/50 rounded-2xl border border-stone-700/50">
-                  <span className="text-xs text-stone-400 block mb-1">圆满长卷经部</span>
-                  <span className="text-2xl sm:text-3xl font-bold font-mono text-amber-300">
+                <div className="p-2 sm:p-4 bg-stone-800/50 rounded-xl sm:rounded-2xl border border-stone-700/50">
+                  <span className="text-[10px] sm:text-xs text-stone-400 block mb-0.5 sm:mb-1 whitespace-nowrap truncate">圆满长卷经部</span>
+                  <span className="text-xl sm:text-3xl font-bold font-mono text-amber-300">
                     {completedCount}
                   </span>
-                  <span className="text-xs text-stone-500 block mt-0.5">部</span>
+                  <span className="text-[10px] sm:text-xs text-stone-500 block mt-0.5">部</span>
                 </div>
               </div>
 

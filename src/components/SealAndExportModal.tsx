@@ -243,49 +243,49 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in font-serif select-none">
-      <div className="relative w-full max-w-2xl bg-stone-900 border border-stone-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2.5 sm:p-4 animate-fade-in font-serif select-none">
+      <div className="relative w-full max-w-2xl bg-stone-900 border border-stone-700/80 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col text-stone-200">
         {/* 顶部标题与 Tab 栏 */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-stone-800">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between px-3.5 sm:px-6 pt-3.5 sm:pt-5 pb-2.5 sm:pb-3 border-b border-stone-800">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <button
               type="button"
               onClick={() => setActiveTab('export')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'export'
                   ? 'bg-amber-900/60 text-amber-200 border border-amber-700/50'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              <Stamp size={15} />
-              <span>钤印落款与长卷导出</span>
+              <Stamp size={14} />
+              <span>钤印导出</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('replay')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'replay'
                   ? 'bg-amber-900/60 text-amber-200 border border-amber-700/50'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              <Film size={15} />
-              <span>笔迹倍速回放</span>
+              <Film size={14} />
+              <span>笔迹回放</span>
             </button>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
+            className="p-1 sm:p-1.5 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* 内容主体 */}
-        <div className="p-6 overflow-y-auto max-h-[75vh]">
+        <div className="p-3.5 sm:p-6 overflow-y-auto max-h-[80vh]">
           {activeTab === 'export' ? (
             <div className="flex flex-col gap-5">
               {/* 印章配置 */}
@@ -388,21 +388,21 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
             </div>
           ) : (
             /* 笔迹倍速回放面板 */
-            <div className="flex flex-col items-center">
-              <div className="relative w-[340px] h-[340px] rounded-2xl overflow-hidden shadow-inner border border-stone-700/60 bg-stone-950 flex items-center justify-center">
+            <div className="flex flex-col items-center w-full">
+              <div className="relative w-full aspect-square max-w-[min(340px,75vw)] max-h-[min(340px,75vw)] rounded-xl sm:rounded-2xl overflow-hidden shadow-inner border border-stone-700/60 bg-stone-950 flex items-center justify-center">
                 <canvas
                   ref={replayCanvasRef}
-                  className="w-[340px] h-[340px]"
+                  className="w-full h-full"
                 />
                 {currentReplayChar && (
-                  <span className="absolute top-3 left-4 text-xs font-serif font-bold text-amber-300/80 px-2 py-0.5 rounded-full bg-stone-900/70 border border-amber-600/30">
+                  <span className="absolute top-2.5 left-3 text-[11px] sm:text-xs font-serif font-bold text-amber-300/80 px-2 py-0.5 rounded-full bg-stone-900/70 border border-amber-600/30">
                     正在回放：「{currentReplayChar}」
                   </span>
                 )}
               </div>
 
               {/* 进度条 */}
-              <div className="w-[340px] mt-4 flex items-center gap-3">
+              <div className="w-full max-w-[min(340px,75vw)] mt-3 sm:mt-4 flex items-center gap-2 sm:gap-3">
                 <span className="text-xs text-stone-400 font-mono">
                   {Math.round(replayProgress * 100)}%
                 </span>
@@ -424,7 +424,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
               </div>
 
               {/* 控制按钮与倍速 */}
-              <div className="w-[340px] mt-3 flex items-center justify-between">
+              <div className="w-full max-w-[min(340px,75vw)] mt-2.5 sm:mt-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"

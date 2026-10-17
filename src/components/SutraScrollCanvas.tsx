@@ -86,9 +86,15 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
 
   // 视口与拖拽滚动状态
   const [viewportWidth, setViewportWidth] = useState(800);
+  const [containerHeight, setContainerHeight] = useState(scrollTotalHeight);
   const [scrollX, setScrollX] = useState(0); // 视口水平偏移量（从右向左为正向）
   const scrollXRef = useRef(0);
   scrollXRef.current = scrollX;
+
+  // 自适应纵向缩放比例（确保在手机窄屏或小高度容器中 8 行经文完整显示，绝不被截断）
+  const displayHeight = Math.max(90, Math.min(scrollTotalHeight, containerHeight - 12));
+  const displayScale = displayHeight / scrollTotalHeight;
+  const displayWidth = Math.round(scrollTotalWidth * displayScale);
 
   // 拖拽手势交互
   const isDraggingRef = useRef(false);
@@ -103,6 +109,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     const updateSize = () => {
       if (containerRef.current) {
         setViewportWidth(containerRef.current.clientWidth);
+        setContainerHeight(containerRef.current.clientHeight);
       }
     };
     updateSize();
@@ -118,16 +125,17 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       if (index < 0 || index >= totalChars) return;
 
       const colIndex = Math.floor(index / charsPerColumn);
-      // 古籍从右向左：第 0 列在最右边
-      const colRightOffset = MARGIN_RIGHT + HEADER_WIDTH + (colIndex + 0.5) * CELL_SIZE;
+      // 古籍从右向左：第 0 列在最右边（经比例缩放）
+      const colRightOffset = (MARGIN_RIGHT + HEADER_WIDTH + (colIndex + 0.5) * CELL_SIZE) * displayScale;
       // 卷轴绝对 X 坐标（从左向右坐标系中）
-      const charCenterX = scrollTotalWidth - colRightOffset;
+      const charCenterX = displayWidth - colRightOffset;
 
       // 目标视口左上角 X：将该字居中偏左（视野黄金分割区）
+      const maxScroll = Math.max(0, displayWidth - viewportWidth);
       const targetScrollX = Math.max(
         0,
         Math.min(
-          scrollTotalWidth - viewportWidth,
+          maxScroll,
           charCenterX - viewportWidth * 0.45
         )
       );
@@ -142,18 +150,18 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       }
       setScrollX(targetScrollX);
     },
-    [charsPerColumn, scrollTotalWidth, totalChars, viewportWidth]
+    [charsPerColumn, displayScale, displayWidth, totalChars, viewportWidth]
   );
 
   // 初始化时：滚动到卷首最右侧（经名签条与首列字）
   useEffect(() => {
     if (containerRef.current) {
       // 卷首在最右端
-      const initialScroll = scrollTotalWidth - viewportWidth;
+      const initialScroll = Math.max(0, displayWidth - viewportWidth);
       containerRef.current.scrollLeft = initialScroll;
       setScrollX(initialScroll);
     }
-  }, [scrollTotalWidth, viewportWidth]);
+  }, [displayWidth, viewportWidth]);
 
   // 当当前书写字进位时，平滑自动追踪
   useEffect(() => {
@@ -402,8 +410,10 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     // 如果手指只是轻点（移动距离小于 6px），判断是否命中了某个字格
     if (dragDistanceRef.current < 6 && onSelectChar && canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
+      const scaleX = scrollTotalWidth / rect.width;
+      const scaleY = scrollTotalHeight / rect.height;
+      const clickX = (e.clientX - rect.left) * scaleX;
+      const clickY = (e.clientY - rect.top) * scaleY;
 
       const columnsStartX = scrollTotalWidth - MARGIN_RIGHT - HEADER_WIDTH;
 
@@ -453,28 +463,28 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
         <div
           className="relative flex-shrink-0 my-auto"
           style={{
-            width: `${scrollTotalWidth}px`,
-            height: `${scrollTotalHeight}px`,
+            width: `${displayWidth}px`,
+            height: `${displayHeight}px`,
           }}
         >
           <canvas
             ref={canvasRef}
             style={{
-              width: `${scrollTotalWidth}px`,
-              height: `${scrollTotalHeight}px`,
+              width: `${displayWidth}px`,
+              height: `${displayHeight}px`,
             }}
             className="shadow-2xl rounded-lg block"
           />
 
-          {/* 金色呼吸高亮框 (GPU 加速 CSS 动效，0% CPU 占用) */}
+          {/* 金色呼吸高亮框 (GPU 加速 CSS 动效，0% CPU 占用，按比例缩放适配) */}
           {hasValidCurrentCell && (
             <div
               className="absolute pointer-events-none rounded transition-all duration-300 ease-out z-10"
               style={{
-                left: `${currentCellX + CELL_PADDING}px`,
-                top: `${currentCellY + CELL_PADDING}px`,
-                width: `${CELL_SIZE - CELL_PADDING * 2}px`,
-                height: `${CELL_SIZE - CELL_PADDING * 2}px`,
+                left: `${(currentCellX + CELL_PADDING) * displayScale}px`,
+                top: `${(currentCellY + CELL_PADDING) * displayScale}px`,
+                width: `${(CELL_SIZE - CELL_PADDING * 2) * displayScale}px`,
+                height: `${(CELL_SIZE - CELL_PADDING * 2) * displayScale}px`,
                 border: '2px solid rgba(218, 165, 32, 0.95)',
                 boxShadow: '0 0 14px 2px rgba(238, 205, 95, 0.65)',
                 animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -484,8 +494,8 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
         </div>
       </div>
 
-      {/* 卷首与卷尾导航提示小浮标 */}
-      <div className="absolute bottom-2 left-4 pointer-events-none text-xs font-serif text-stone-500/80 bg-stone-900/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-stone-600/30">
+      {/* 卷首与卷尾导航提示小浮标（大屏展示，手机端隐藏避免挤占空间） */}
+      <div className="hidden sm:block absolute bottom-2 left-4 pointer-events-none text-xs font-serif text-stone-500/80 bg-stone-900/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-stone-600/30">
         <span>从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写</span>
       </div>
     </div>

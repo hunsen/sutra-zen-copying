@@ -267,35 +267,35 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in font-serif select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in font-serif select-none p-3 overflow-y-auto">
       {/* 右上角跳过按钮 */}
       <button
         type="button"
         onClick={onSkip}
-        className="absolute top-6 right-6 flex items-center gap-1.5 px-4 py-2 rounded-full bg-stone-900/80 hover:bg-stone-800 text-stone-400 hover:text-stone-100 border border-stone-700/60 text-xs sm:text-sm font-medium transition-all"
+        className="absolute top-3 sm:top-6 right-3 sm:right-6 flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-stone-900/80 hover:bg-stone-800 text-stone-400 hover:text-stone-100 border border-stone-700/60 text-xs sm:text-sm font-medium transition-all z-20"
       >
         <span>跳过仪式</span>
-        <X size={16} />
+        <X size={15} />
       </button>
 
       {/* 仪式主体面板 */}
-      <div className="flex flex-col items-center max-w-sm sm:max-w-md w-full px-4 text-center">
+      <div className="flex flex-col items-center max-w-sm sm:max-w-md w-full px-2 sm:px-4 py-4 text-center my-auto">
         {/* 顶部标语 */}
-        <div className="flex items-center gap-2 mb-2 text-amber-400/90 text-sm tracking-widest uppercase">
-          <Sparkles size={16} />
+        <div className="flex items-center gap-1.5 mb-1.5 text-amber-400/90 text-xs sm:text-sm tracking-widest uppercase">
+          <Sparkles size={14} />
           <span>开卷焚香 · 调息净手</span>
-          <Sparkles size={16} />
+          <Sparkles size={14} />
         </div>
 
-        <h2 className="text-2xl sm:text-3xl font-bold text-amber-50 mb-3 tracking-widest">
+        <h2 className="text-xl sm:text-3xl font-bold text-amber-50 mb-2 tracking-widest">
           静心抄经
         </h2>
 
         {/* 核心焚香画布与呼吸引导环 */}
-        <div className="relative w-[300px] h-[320px] flex items-center justify-center my-2">
+        <div className="relative w-[260px] sm:w-[300px] h-[240px] sm:h-[320px] flex items-center justify-center my-1 sm:my-2">
           {/* 呼吸外扩动态光环 */}
           <div
-            className="absolute inset-0 m-auto w-56 h-56 rounded-full border-2 border-amber-500/30 transition-transform duration-100 ease-out pointer-events-none"
+            className="absolute inset-0 m-auto w-44 h-44 sm:w-56 sm:h-56 rounded-full border-2 border-amber-500/30 transition-transform duration-100 ease-out pointer-events-none"
             style={{
               transform: `scale(${scaleCircle})`,
               boxShadow:
@@ -308,20 +308,20 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
           {/* 青烟与香炉 Canvas */}
           <canvas
             ref={canvasRef}
-            className="relative z-10 w-[300px] h-[360px]"
+            className="relative z-10 w-[260px] sm:w-[300px] h-[300px] sm:h-[360px]"
           />
         </div>
 
         {/* 呼吸指引文案 */}
-        <div className="min-h-[50px] flex flex-col items-center justify-center">
-          <p className="text-lg sm:text-xl text-amber-200 tracking-widest font-medium transition-all">
+        <div className="min-h-[42px] flex flex-col items-center justify-center">
+          <p className="text-base sm:text-xl text-amber-200 tracking-widest font-medium transition-all">
             {phaseTexts[phase]}
           </p>
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-2 mt-1.5 sm:mt-2">
             {[1, 2, 3].map((b) => (
               <span
                 key={b}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
                   b === breathCount
                     ? 'bg-amber-400 scale-125'
                     : b < breathCount
@@ -337,10 +337,10 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
         <button
           type="button"
           onClick={onComplete}
-          className="mt-6 flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 font-medium text-sm sm:text-base tracking-widest shadow-xl transition-all active:scale-95 border border-amber-600/40"
+          className="mt-4 sm:mt-6 flex items-center justify-center gap-1.5 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 font-medium text-xs sm:text-base tracking-widest shadow-xl transition-all active:scale-95 border border-amber-600/40 whitespace-nowrap"
         >
           <span>净手敬书 · 开始抄经</span>
-          <ChevronRight size={18} />
+          <ChevronRight size={16} />
         </button>
       </div>
     </div>

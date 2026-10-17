@@ -93,35 +93,35 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
 
   return (
     <div
-      className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
+      className={`fixed top-2 sm:top-3 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out max-w-[96vw] ${
         isWriting
           ? 'opacity-25 hover:opacity-100 hover:scale-100 scale-95'
           : 'opacity-100 scale-100'
       }`}
     >
-      <div className="flex items-center gap-1.5 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 bg-stone-900/85 hover:bg-stone-900/95 backdrop-blur-xl border border-stone-700/60 shadow-2xl rounded-full text-stone-200 transition-colors">
+      <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-stone-900/85 hover:bg-stone-900/95 backdrop-blur-xl border border-stone-700/60 shadow-2xl rounded-full text-stone-200 transition-colors">
         {/* 藏经阁入口 */}
         <button
           type="button"
           onClick={onOpenLibrary}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full hover:bg-stone-800 text-amber-200 hover:text-amber-100 transition-all font-serif text-xs sm:text-sm font-medium tracking-wide active:scale-95"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full hover:bg-stone-800 text-amber-200 hover:text-amber-100 transition-all font-serif text-xs sm:text-sm font-medium tracking-wide active:scale-95"
           title="藏经阁：选经、自建字帖与功德簿"
         >
-          <BookOpen size={15} />
-          <span className="max-w-[100px] sm:max-w-[130px] truncate">{title}</span>
+          <BookOpen size={14} className="flex-shrink-0" />
+          <span className="max-w-[65px] sm:max-w-[130px] truncate">{title}</span>
         </button>
 
-        <div className="w-[1px] h-4 bg-stone-700/80" />
+        <div className="w-[1px] h-3.5 bg-stone-700/80" />
 
         {/* 纸墨主题切换下拉触发 */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setShowThemeMenu(!showThemeMenu)}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-full hover:bg-stone-800 text-stone-300 hover:text-stone-100 transition-all font-serif text-xs active:scale-95"
+            className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full hover:bg-stone-800 text-stone-300 hover:text-stone-100 transition-all font-serif text-xs active:scale-95"
             title="选择纸张古笺与墨色"
           >
-            <Palette size={14} className="text-amber-400" />
+            <Palette size={13} className="text-amber-400 flex-shrink-0" />
             <span className="hidden sm:inline">{PAPER_THEMES[paperTheme]?.name}</span>
           </button>
 
@@ -200,47 +200,46 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
           )}
         </div>
 
-        <div className="w-[1px] h-4 bg-stone-700/80" />
+        <div className="w-[1px] h-3.5 bg-stone-700/80" />
 
         {/* 抄经进度指示 */}
-        <div className="flex items-center gap-1.5 text-xs text-stone-300 font-serif">
-          <Scroll size={13} className="text-amber-400 hidden sm:inline" />
+        <div className="flex items-center gap-1 text-[11px] sm:text-xs text-stone-300 font-serif whitespace-nowrap">
+          <Scroll size={12} className="text-amber-400 hidden sm:inline flex-shrink-0" />
           <span>
             {Math.min(currentIndex + 1, totalChars)}/{totalChars}
           </span>
-          <span className="text-stone-400 text-[10px]">({percent}%)</span>
+          <span className="text-stone-400 text-[10px] hidden xs:inline">({percent}%)</span>
         </div>
 
-        <div className="w-[1px] h-4 bg-stone-700/80" />
-
-        {/* 静心计时器 */}
-        <div className="flex items-center gap-1.5 text-xs text-stone-300 font-serif">
-          <Clock size={13} className="text-amber-400/80" />
+        {/* 静心计时器（大屏展示，手机端紧凑布局） */}
+        <div className="hidden sm:flex items-center gap-1 text-xs text-stone-300 font-serif">
+          <div className="w-[1px] h-3.5 bg-stone-700/80 mr-1" />
+          <Clock size={12} className="text-amber-400/80 flex-shrink-0" />
           <span className="font-mono text-[11px] tracking-wider text-amber-100">
             {formatDuration(durationSec)}
           </span>
         </div>
 
-        <div className="w-[1px] h-4 bg-stone-700/80" />
+        <div className="w-[1px] h-3.5 bg-stone-700/80" />
 
         {/* 音效开关 */}
         <button
           type="button"
           onClick={onToggleMute}
-          className="p-1 sm:p-1.5 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
+          className="p-1 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
           title={isMuted ? '解除静音' : '禅音静音'}
         >
-          {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+          {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
         </button>
 
         {/* 卷尾装裱与导出长图 */}
         <button
           type="button"
           onClick={onOpenExport}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-800/80 hover:bg-amber-700 text-amber-50 font-serif text-xs font-medium transition-all shadow-sm active:scale-95"
+          className="flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-amber-800/80 hover:bg-amber-700 text-amber-50 font-serif text-xs font-medium transition-all shadow-sm active:scale-95 whitespace-nowrap"
           title="钤印落款与长卷高清导出"
         >
-          <Download size={13} />
+          <Download size={12} />
           <span className="hidden sm:inline">钤印导出</span>
         </button>
       </div>

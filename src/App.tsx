@@ -35,6 +35,7 @@ import { TopZenCapsule } from './components/TopZenCapsule';
 import { IncenseRitualModal } from './components/IncenseRitualModal';
 import { SealAndExportModal } from './components/SealAndExportModal';
 import { SutraLibraryModal } from './components/SutraLibraryModal';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 export const App: React.FC = () => {
   // 当前抄经经文
@@ -63,6 +64,9 @@ export const App: React.FC = () => {
   const [showIncenseModal, setShowIncenseModal] = useState<boolean>(true); // 首次进入引导开卷焚香
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [showLibraryModal, setShowLibraryModal] = useState<boolean>(false);
+
+  // 手机窄屏竖排手卷全屏展开模式
+  const [isScrollExpandedMobile, setIsScrollExpandedMobile] = useState<boolean>(false);
 
   // 保持会话起始时间稳定
   const startedAtRef = useRef<number>(Date.now());
@@ -383,16 +387,40 @@ export const App: React.FC = () => {
         onOpenExport={handleOpenExport}
       />
 
-      {/* 主工作区：响应式双区联动布局 */}
-      <main className="w-full h-full flex flex-col lg:flex-row pt-14 pb-2 px-2 sm:px-4 gap-2 sm:gap-4 overflow-hidden">
-        {/* 左区：竖排从右至左全景手卷预览与浏览区（大屏占宽 60%） */}
+      {/* 主工作区：响应式双区联动布局（适配移动端横竖屏与桌面/平板双模式） */}
+      <main className="w-full h-full flex flex-col landscape:flex-row lg:flex-row pt-12 sm:pt-14 pb-1 sm:pb-2 px-1.5 sm:px-4 gap-1.5 sm:gap-4 overflow-hidden">
+        {/* 左区：竖排从右至左全景手卷预览与浏览区（大屏占宽 60%，手机端自适应折叠展开） */}
         <section
-          className="flex-1 lg:w-[60%] h-[42vh] lg:h-full relative rounded-2xl overflow-hidden border border-stone-800/20 shadow-inner flex items-center justify-center p-2"
+          className={`relative rounded-xl sm:rounded-2xl overflow-hidden border border-stone-800/20 shadow-inner flex items-center justify-center p-1 sm:p-2 transition-all duration-300 ${
+            isScrollExpandedMobile
+              ? 'flex-1 w-full h-full'
+              : 'flex-none h-[22vh] min-h-[125px] max-h-[170px] landscape:h-full landscape:flex-1 landscape:w-[58%] lg:h-full lg:flex-1 lg:w-[60%]'
+          }`}
           style={{
             background:
               'radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.05) 100%)',
           }}
         >
+          {/* 手机竖屏模式下的展开长卷/返回书写快捷胶囊 */}
+          <button
+            type="button"
+            onClick={() => setIsScrollExpandedMobile(!isScrollExpandedMobile)}
+            className="lg:hidden landscape:hidden absolute top-2 right-2 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full bg-stone-900/85 hover:bg-stone-800 backdrop-blur-md border border-stone-700/60 text-[11px] font-serif text-amber-200 transition-all active:scale-95 shadow-md"
+            title={isScrollExpandedMobile ? '收起长卷，返回书写台' : '全屏展开浏览整篇长卷'}
+          >
+            {isScrollExpandedMobile ? (
+              <>
+                <Minimize2 size={12} />
+                <span>返回临摹</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 size={12} />
+                <span>展开长卷</span>
+              </>
+            )}
+          </button>
+
           <SutraScrollCanvas
             content={sutra.content}
             title={sutra.title}
@@ -404,13 +432,23 @@ export const App: React.FC = () => {
             inkType={inkType}
             dedicationText={dedicationText}
             sealText={sealText}
-            onSelectChar={handleSelectChar}
+            onSelectChar={(targetIndex) => {
+              handleSelectChar(targetIndex);
+              // 手机竖屏如果在长卷全景中点了某个字，自动收起切回书写
+              if (isScrollExpandedMobile) {
+                setIsScrollExpandedMobile(false);
+              }
+            }}
           />
         </section>
 
-        {/* 右区：黄金落笔区——手指专属放大米字格书写台（大屏占宽 40%） */}
+        {/* 右区：黄金落笔区——手指专属放大米字格书写台（大屏占宽 40%，手机端自适应撑满可用高度） */}
         <section
-          className="flex-shrink-0 lg:w-[40%] h-[58vh] lg:h-full flex flex-col items-center justify-center relative p-1 sm:p-4"
+          className={`flex flex-col items-center justify-center relative p-1 sm:p-4 overflow-hidden transition-all duration-300 ${
+            isScrollExpandedMobile
+              ? 'hidden'
+              : 'flex-1 min-h-0 landscape:w-[42%] landscape:h-full lg:w-[40%] lg:h-full'
+          }`}
         >
           <ZoomWritingPad
             currentChar={currentChar}

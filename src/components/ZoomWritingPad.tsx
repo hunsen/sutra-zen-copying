@@ -605,44 +605,44 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
   const strokeDashoffset = ringCircumference * (1 - countdownProgress);
 
   return (
-    <div className="flex flex-col items-center select-none">
+    <div className="flex flex-col items-center select-none w-full max-w-[380px] mx-auto px-1">
       {/* 顶部指示条：当前字、笔画进度反馈与字模控制 */}
-      <div className="w-[380px] flex items-center justify-between px-2 mb-2 text-stone-700">
-        <div className="flex items-center space-x-2">
-          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-900/10 text-amber-950 font-serif font-medium border border-amber-900/20">
-            第 {charIndex + 1} / {totalChars} 字
+      <div className="w-full flex items-center justify-between px-1 mb-1.5 sm:mb-2 text-stone-700 flex-shrink-0">
+        <div className="flex items-center space-x-1.5 sm:space-x-2">
+          <span className="text-[11px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-900/10 text-amber-950 font-serif font-medium border border-amber-900/20 whitespace-nowrap">
+            第 {charIndex + 1}/{totalChars}
           </span>
-          <span className="text-xl font-serif font-bold text-stone-900 tracking-wider">
+          <span className="text-lg sm:text-xl font-serif font-bold text-stone-900 tracking-wider">
             「{currentChar}」
           </span>
 
           {/* 实时笔画状态胶囊徽标 */}
           <span
-            className={`text-xs px-2 py-0.5 rounded-full font-serif font-medium transition-all flex items-center gap-1 ${
+            className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-serif font-medium transition-all flex items-center gap-1 ${
               isComplete
                 ? 'bg-amber-100 text-amber-900 border border-amber-400 shadow-sm animate-pulse-slow'
                 : 'bg-stone-200/80 text-stone-600 border border-stone-300'
             }`}
             title={`当前字标准笔画约 ${expectedStrokes} 笔，已书写 ${currentStrokeCount} 笔`}
           >
-            {isComplete && <Sparkles size={11} className="text-amber-700" />}
-            <span>
+            {isComplete && <Sparkles size={11} className="text-amber-700 flex-shrink-0" />}
+            <span className="whitespace-nowrap">
               {isComplete
-                ? `笔画圆满 (${currentStrokeCount}/${expectedStrokes} 笔)`
-                : `书写中: ${currentStrokeCount}/${expectedStrokes} 笔`}
+                ? `圆满 (${currentStrokeCount}/${expectedStrokes})`
+                : `${currentStrokeCount}/${expectedStrokes}笔`}
             </span>
           </span>
         </div>
 
         {/* 字模透明度控制胶囊 */}
-        <div className="flex items-center space-x-2 bg-stone-100/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-stone-200/80 text-xs">
+        <div className="flex items-center space-x-1.5 bg-stone-100/80 backdrop-blur-sm px-2 py-0.5 sm:py-1 rounded-full border border-stone-200/80 text-xs">
           <button
             type="button"
             onClick={() => setShowGuideChar(!showGuideChar)}
             title={showGuideChar ? '隐藏底稿字模' : '显示底稿字模'}
             className="text-stone-600 hover:text-stone-900 transition-colors"
           >
-            {showGuideChar ? <Eye size={15} /> : <EyeOff size={15} />}
+            {showGuideChar ? <Eye size={14} /> : <EyeOff size={14} />}
           </button>
           {showGuideChar && (
             <input
@@ -652,16 +652,16 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
               step="0.01"
               value={guideOpacity}
               onChange={(e) => setGuideOpacity(parseFloat(e.target.value))}
-              className="w-14 h-1 bg-stone-300 rounded-lg appearance-none cursor-pointer accent-amber-800"
+              className="w-10 sm:w-14 h-1 bg-stone-300 rounded-lg appearance-none cursor-pointer accent-amber-800"
               title="调节底稿浓度"
             />
           )}
         </div>
       </div>
 
-      {/* 核心书写画布区域（380x380 px，带微光禅意阴影与圆角乌丝栏框） */}
+      {/* 核心书写画布区域（自适应方格，按可用宽高自适应缩放） */}
       <div
-        className={`relative w-[380px] h-[380px] rounded-2xl overflow-hidden shadow-2xl border-2 touch-none bg-stone-100 transition-colors duration-200 ${
+        className={`relative w-full aspect-square max-w-[min(380px,88vw,calc(100vh-250px))] max-h-[min(380px,88vw,calc(100vh-250px))] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 touch-none bg-stone-100 transition-colors duration-200 flex-shrink-0 ${
           isDrawing ? 'border-amber-700/60 ring-2 ring-amber-500/20' : 'border-stone-300/80'
         }`}
         style={{
@@ -672,25 +672,23 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
         {/* 底层画布：宣纸纹理 + 米字格 + 楷体字模 */}
         <canvas
           ref={bgCanvasRef}
-          style={{ width: `${PAD_SIZE}px`, height: `${PAD_SIZE}px` }}
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 w-full h-full pointer-events-none"
         />
 
         {/* 顶层手写交互画布：高分屏抗锯齿矢量笔墨 */}
         <canvas
           ref={strokeCanvasRef}
-          style={{ width: `${PAD_SIZE}px`, height: `${PAD_SIZE}px` }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerCancel}
-          className="absolute inset-0 cursor-crosshair z-10"
+          className="absolute inset-0 w-full h-full cursor-crosshair z-10"
         />
 
         {/* 停笔自动走纸倒计时环形视觉反馈（悬浮在右上角） */}
         {countdownProgress > 0 && countdownProgress < 1.0 && (
-          <div className="absolute top-3 right-3 z-20 pointer-events-none flex items-center bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-amber-900/20 animate-fade-in">
-            <svg className="w-5 h-5 transform -rotate-90 mr-1.5" viewBox="0 0 52 52">
+          <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none flex items-center bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-lg border border-amber-900/20 animate-fade-in">
+            <svg className="w-4 h-4 transform -rotate-90 mr-1" viewBox="0 0 52 52">
               <circle
                 cx="26"
                 cy="26"
@@ -712,24 +710,24 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
                 className="transition-all duration-75"
               />
             </svg>
-            <span className="text-[11px] font-serif font-medium text-amber-950">
-              整字写完，走纸中...
+            <span className="text-[10px] sm:text-[11px] font-serif font-medium text-amber-950">
+              走纸中...
             </span>
           </div>
         )}
       </div>
 
       {/* 底部人体工学防误触操作栏 */}
-      <div className="w-[380px] mt-3.5 flex items-center justify-between gap-2 px-1">
+      <div className="w-full mt-2 sm:mt-3 flex items-center justify-between gap-1 sm:gap-2 px-0.5 flex-shrink-0">
         {/* 撤销上一笔 */}
         <button
           type="button"
           onClick={handleUndoLastStroke}
           disabled={strokes.length === 0}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-stone-200/80 hover:bg-stone-300/80 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-stone-800 font-serif text-sm font-medium transition-all shadow-sm"
+          className="flex-1 flex items-center justify-center gap-1 py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg sm:rounded-xl bg-stone-200/80 hover:bg-stone-300/80 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-stone-800 font-serif text-xs sm:text-sm font-medium transition-all shadow-sm"
           title="撤销上一笔画"
         >
-          <RotateCcw size={16} />
+          <RotateCcw size={15} />
           <span>撤销</span>
         </button>
 
@@ -738,10 +736,10 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
           type="button"
           onClick={handleClearCurrentChar}
           disabled={strokes.length === 0}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-stone-200/80 hover:bg-rose-100 active:scale-95 hover:text-rose-900 disabled:opacity-40 disabled:pointer-events-none text-stone-800 font-serif text-sm font-medium transition-all shadow-sm"
+          className="flex-1 flex items-center justify-center gap-1 py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg sm:rounded-xl bg-stone-200/80 hover:bg-rose-100 active:scale-95 hover:text-rose-900 disabled:opacity-40 disabled:pointer-events-none text-stone-800 font-serif text-xs sm:text-sm font-medium transition-all shadow-sm"
           title="清空当前字迹重写"
         >
-          <Trash2 size={16} />
+          <Trash2 size={15} />
           <span>重写</span>
         </button>
 
@@ -751,10 +749,10 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
             type="button"
             onClick={handleManualPrev}
             disabled={charIndex <= 0}
-            className="p-2.5 rounded-xl bg-stone-200/80 hover:bg-stone-300/80 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-stone-800 transition-all shadow-sm"
+            className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-stone-200/80 hover:bg-stone-300/80 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-stone-800 transition-all shadow-sm"
             title="回到上一字"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
           </button>
         )}
 
@@ -762,7 +760,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
         <button
           type="button"
           onClick={handleManualAdvanceNext}
-          className={`flex-[1.4] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl font-serif text-sm font-medium transition-all shadow-md active:scale-95 ${
+          className={`flex-[1.4] flex items-center justify-center gap-1 py-2 sm:py-2.5 px-2.5 sm:px-3 rounded-lg sm:rounded-xl font-serif text-xs sm:text-sm font-medium transition-all shadow-md active:scale-95 ${
             isComplete
               ? 'bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-amber-50 ring-2 ring-amber-500/50 shadow-amber-900/30'
               : 'bg-gradient-to-r from-stone-800 to-stone-900 hover:from-stone-700 hover:to-stone-800 text-stone-200'
@@ -770,32 +768,32 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
           title="整字写完，烘焙入卷并切入下一字"
         >
           <span>{charIndex >= totalChars - 1 ? '圆满结卷' : '写完走纸'}</span>
-          <ChevronRight size={16} />
+          <ChevronRight size={15} />
         </button>
       </div>
 
       {/* 底部走纸模式设置面板 */}
-      <div className="w-[380px] mt-2.5 flex items-center justify-between px-2 text-xs text-stone-500 font-serif relative">
-        <div className="flex items-center gap-2">
+      <div className="w-full mt-1.5 sm:mt-2.5 flex items-center justify-between px-1 text-[11px] sm:text-xs text-stone-500 font-serif relative flex-shrink-0">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => setShowAdvanceMenu(!showAdvanceMenu)}
-            className="flex items-center gap-1.5 text-stone-600 hover:text-stone-900 transition-colors"
+            className="flex items-center gap-1 text-stone-600 hover:text-stone-900 transition-colors"
           >
-            <SlidersHorizontal size={13} className="text-amber-800" />
-            <span className="font-medium text-stone-700">走纸模式：</span>
-            <span className="text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-300/60">
-              {advanceMode === 'smart' && '✨ 智能字成自动走纸'}
-              {advanceMode === 'manual' && '✍️ 手动点击/手势走纸'}
+            <SlidersHorizontal size={12} className="text-amber-800" />
+            <span className="font-medium text-stone-700 hidden xs:inline">走纸模式：</span>
+            <span className="text-amber-900 bg-amber-100/80 px-1.5 py-0.5 rounded text-[10px] sm:text-xs border border-amber-300/60 whitespace-nowrap">
+              {advanceMode === 'smart' && '✨ 智能字成'}
+              {advanceMode === 'manual' && '✍️ 手动点击'}
               {advanceMode === 'timed' && '⏱️ 定时走纸'}
             </span>
           </button>
         </div>
 
         {/* 智能说明气泡 */}
-        <span className="text-[11px] text-stone-400">
+        <span className="text-[10px] sm:text-[11px] text-stone-400 truncate max-w-[150px] sm:max-w-none text-right">
           {advanceMode === 'smart'
-            ? '整字笔画写满才自动走纸'
+            ? '整字写满自动走纸'
             : advanceMode === 'manual'
             ? '自由书写不限时'
             : `${(countdownDurationMs / 1000).toFixed(1)}s 停笔走纸`}
