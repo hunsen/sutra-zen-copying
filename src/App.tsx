@@ -394,7 +394,7 @@ export const App: React.FC = () => {
           className={`relative rounded-xl sm:rounded-2xl overflow-hidden border border-stone-800/20 shadow-inner flex items-center justify-center p-1 sm:p-2 transition-all duration-300 ${
             isScrollExpandedMobile
               ? 'flex-1 w-full h-full'
-              : 'flex-none h-[22vh] min-h-[125px] max-h-[170px] landscape:h-full landscape:flex-1 landscape:w-[58%] lg:h-full lg:flex-1 lg:w-[60%]'
+              : 'flex-none h-[26vh] min-h-[145px] max-h-[200px] landscape:h-full landscape:flex-1 landscape:w-[58%] lg:h-full lg:flex-1 lg:w-[60%]'
           }`}
           style={{
             background:

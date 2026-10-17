@@ -122,9 +122,9 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
     if (!ctx) return;
 
     const width = (canvas.width = 300);
-    const height = (canvas.height = 360);
+    const height = (canvas.height = 250);
     const emitterX = width / 2;
-    const emitterY = height - 70; // 香炉顶部香火位置
+    const emitterY = 160; // 香炉顶部香火位置
 
     smokeParticlesRef.current = [];
     const particles = smokeParticlesRef.current;
@@ -144,7 +144,7 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
           vy: -(0.8 + Math.random() * 0.8),
           size: 3 + Math.random() * 4,
           alpha: 0.55 + Math.random() * 0.25,
-          maxLife: 160 + Math.random() * 60,
+          maxLife: 130 + Math.random() * 45,
           life: 0,
           curve: Math.random() * Math.PI * 2,
         });
@@ -157,7 +157,7 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
       ctx.lineWidth = 2.0;
       ctx.beginPath();
       ctx.moveTo(emitterX, emitterY);
-      ctx.lineTo(emitterX, emitterY + 50);
+      ctx.lineTo(emitterX, emitterY + 45);
       ctx.stroke();
 
       // 香火微光（红亮微闪点）
@@ -167,21 +167,21 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
       ctx.arc(emitterX, emitterY, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // 铜香炉（三足双耳宣德炉简雅剪影）
-      const burnerY = emitterY + 50;
+      // 铜香炉（三足双耳宣德炉简雅剪影，置于 Y=205~220，留出足够空间绝不压住下方文字）
+      const burnerY = emitterY + 45;
       ctx.fillStyle = '#4A3B32';
       ctx.strokeStyle = '#D4AF37';
       ctx.lineWidth = 1.0;
 
       // 炉身
       ctx.beginPath();
-      ctx.ellipse(emitterX, burnerY + 8, 28, 12, 0, 0, Math.PI * 2);
+      ctx.ellipse(emitterX, burnerY + 8, 28, 11, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
       // 炉底
       ctx.beginPath();
-      ctx.ellipse(emitterX, burnerY + 12, 20, 8, 0, 0, Math.PI);
+      ctx.ellipse(emitterX, burnerY + 12, 20, 7, 0, 0, Math.PI);
       ctx.fillStyle = '#3A2B22';
       ctx.fill();
       ctx.restore();
@@ -292,10 +292,10 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
         </h2>
 
         {/* 核心焚香画布与呼吸引导环 */}
-        <div className="relative w-[260px] sm:w-[300px] h-[240px] sm:h-[320px] flex items-center justify-center my-1 sm:my-2">
+        <div className="relative w-[300px] h-[250px] flex items-center justify-center my-1 flex-shrink-0">
           {/* 呼吸外扩动态光环 */}
           <div
-            className="absolute inset-0 m-auto w-44 h-44 sm:w-56 sm:h-56 rounded-full border-2 border-amber-500/30 transition-transform duration-100 ease-out pointer-events-none"
+            className="absolute inset-0 m-auto w-44 h-44 rounded-full border-2 border-amber-500/30 transition-transform duration-100 ease-out pointer-events-none"
             style={{
               transform: `scale(${scaleCircle})`,
               boxShadow:
@@ -308,13 +308,13 @@ export const IncenseRitualModal: React.FC<IncenseRitualModalProps> = ({
           {/* 青烟与香炉 Canvas */}
           <canvas
             ref={canvasRef}
-            className="relative z-10 w-[260px] sm:w-[300px] h-[300px] sm:h-[360px]"
+            className="relative z-10 w-[300px] h-[250px]"
           />
         </div>
 
         {/* 呼吸指引文案 */}
-        <div className="min-h-[42px] flex flex-col items-center justify-center">
-          <p className="text-base sm:text-xl text-amber-200 tracking-widest font-medium transition-all">
+        <div className="min-h-[46px] flex flex-col items-center justify-center mt-3">
+          <p className="text-base sm:text-lg text-amber-200 tracking-widest font-medium transition-all">
             {phaseTexts[phase]}
           </p>
           <div className="flex gap-2 mt-1.5 sm:mt-2">

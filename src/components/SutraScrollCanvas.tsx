@@ -1,13 +1,14 @@
 // ============================================================================
 // 「静心抄经」竖排从右至左全景长卷渲染器
 // src/components/SutraScrollCanvas.tsx
-// 1. 传统中国古籍竖排从右至左（每列 8 字格，乌丝栏/朱丝栏双边框）
+// 1. 传统中国古籍竖排从右至左（智能自适应：手机窄屏大字横卷 2~3 行，大屏全景 8 行）
 // 2. 卷首右侧双边框经名签条 + 卷尾回向文与朱砂篆刻印章
 // 3. 已抄写字格调用 FingerBrushEngine 矢量重绘；当前字格柔和金色呼吸框高亮 + 实时镜像渲染
 // 4. 手势平滑左右拖拽浏览长卷 + 点击任意字格跳转重写 + 走纸自动居中平滑追踪
+// 5. 显存与像素完美适配：物理 Canvas 按视口精确分配，杜绝 iOS WebKit 超大纹理溢出崩溃
 // ============================================================================
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import {
   WrittenCharRecord,
   BrushStroke,
@@ -43,18 +44,12 @@ export interface SutraScrollCanvasProps {
   sealText?: string;
   /** 点击字格跳转回调 */
   onSelectChar?: (charIndex: number) => void;
-  /** 每列字数（默认 8 字） */
+  /** 每列字数（默认自适应） */
   charsPerColumn?: number;
 }
 
-const CELL_SIZE = 76; // 每个字格像素宽高
+const CELL_SIZE = 76; // 每个字格设计基准尺寸 (px)
 const CELL_PADDING = 4; // 字格内边距
-const HEADER_WIDTH = 130; // 卷首经名签条宽度
-const TAIL_WIDTH = 140; // 卷尾回向文与印章宽度
-const MARGIN_RIGHT = 45; // 卷首右侧天头留白
-const MARGIN_LEFT = 60; // 卷尾左侧地头留白
-const MARGIN_TOP = 40; // 卷顶留白
-const MARGIN_BOTTOM = 40; // 卷底留白
 
 export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
   content,
@@ -68,15 +63,55 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
   dedicationText = '愿以此功德，普及于一切，我等与众生，皆共成佛道。',
   sealText = '静心',
   onSelectChar,
-  charsPerColumn = 8,
+  charsPerColumn,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  // 视口与拖拽滚动状态
+  const [viewportWidth, setViewportWidth] = useState(800);
+  const [containerHeight, setContainerHeight] = useState(300);
+  const [scrollX, setScrollX] = useState(0); // 视口水平偏移量（从右向左为正向）
+  const scrollXRef = useRef(0);
+  scrollXRef.current = scrollX;
+
+  // 用户手动选择的排版模式：'auto'（自动感知高度）| 'large'（大字横卷 2~3 行）| 'classic'（经典全景 8 行）
+  const [layoutMode, setLayoutMode] = useState<'auto' | 'large' | 'classic'>('auto');
+
+  // 计算当前有效每列行数
+  const effectiveCharsPerColumn = useMemo(() => {
+    if (charsPerColumn && charsPerColumn !== 8) {
+      return charsPerColumn;
+    }
+    if (layoutMode === 'large') {
+      return containerHeight < 175 ? 2 : 3;
+    }
+    if (layoutMode === 'classic') {
+      return 8;
+    }
+    // 'auto' 模式
+    if (containerHeight < 175) {
+      return 2; // 极窄屏幕胶囊横卷：双行大字
+    }
+    if (containerHeight < 280) {
+      return 3; // 手机竖屏预览栏：三行大字，单字高度清晰饱满
+    }
+    return 8; // 平板、桌面或全屏展开模式：经典经折装八行
+  }, [charsPerColumn, containerHeight, layoutMode]);
+
+  // 边距与标头尺寸根据行数动态微调
+  const isCompactMode = effectiveCharsPerColumn <= 3;
+  const MARGIN_TOP = isCompactMode ? 16 : 40;
+  const MARGIN_BOTTOM = isCompactMode ? 16 : 40;
+  const MARGIN_RIGHT = isCompactMode ? 28 : 45;
+  const MARGIN_LEFT = isCompactMode ? 36 : 60;
+  const HEADER_WIDTH = isCompactMode ? (effectiveCharsPerColumn <= 2 ? 96 : 110) : 130;
+  const TAIL_WIDTH = isCompactMode ? (effectiveCharsPerColumn <= 2 ? 110 : 125) : 140;
+
   // 几何计算
   const totalChars = content.length;
-  const numColumns = Math.max(1, Math.ceil(totalChars / charsPerColumn));
-  const scrollTotalHeight = MARGIN_TOP + charsPerColumn * CELL_SIZE + MARGIN_BOTTOM;
+  const numColumns = Math.max(1, Math.ceil(totalChars / effectiveCharsPerColumn));
+  const scrollTotalHeight = MARGIN_TOP + effectiveCharsPerColumn * CELL_SIZE + MARGIN_BOTTOM;
   const scrollTotalWidth =
     MARGIN_RIGHT +
     HEADER_WIDTH +
@@ -84,15 +119,8 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     TAIL_WIDTH +
     MARGIN_LEFT;
 
-  // 视口与拖拽滚动状态
-  const [viewportWidth, setViewportWidth] = useState(800);
-  const [containerHeight, setContainerHeight] = useState(scrollTotalHeight);
-  const [scrollX, setScrollX] = useState(0); // 视口水平偏移量（从右向左为正向）
-  const scrollXRef = useRef(0);
-  scrollXRef.current = scrollX;
-
-  // 自适应纵向缩放比例（确保在手机窄屏或小高度容器中 8 行经文完整显示，绝不被截断）
-  const displayHeight = Math.max(90, Math.min(scrollTotalHeight, containerHeight - 12));
+  // 自适应纵向缩放比例（保证字画卷在视口中完整垂直居中显示）
+  const displayHeight = Math.max(90, Math.min(scrollTotalHeight, containerHeight - 8));
   const displayScale = displayHeight / scrollTotalHeight;
   const displayWidth = Math.round(scrollTotalWidth * displayScale);
 
@@ -124,7 +152,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     (index: number, smooth = true) => {
       if (index < 0 || index >= totalChars) return;
 
-      const colIndex = Math.floor(index / charsPerColumn);
+      const colIndex = Math.floor(index / effectiveCharsPerColumn);
       // 古籍从右向左：第 0 列在最右边（经比例缩放）
       const colRightOffset = (MARGIN_RIGHT + HEADER_WIDTH + (colIndex + 0.5) * CELL_SIZE) * displayScale;
       // 卷轴绝对 X 坐标（从左向右坐标系中）
@@ -150,13 +178,20 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       }
       setScrollX(targetScrollX);
     },
-    [charsPerColumn, displayScale, displayWidth, totalChars, viewportWidth]
+    [
+      HEADER_WIDTH,
+      MARGIN_RIGHT,
+      displayScale,
+      displayWidth,
+      effectiveCharsPerColumn,
+      totalChars,
+      viewportWidth,
+    ]
   );
 
   // 初始化时：滚动到卷首最右侧（经名签条与首列字）
   useEffect(() => {
     if (containerRef.current) {
-      // 卷首在最右端
       const initialScroll = Math.max(0, displayWidth - viewportWidth);
       containerRef.current.scrollLeft = initialScroll;
       setScrollX(initialScroll);
@@ -175,16 +210,20 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    // 画布像素尺寸
-    canvas.width = scrollTotalWidth * dpr;
-    canvas.height = scrollTotalHeight * dpr;
+    // 限制 DPR 最大为 2，避免手机 3x 高分屏创建超大离屏纹理产生性能开销与显存溢出
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    // 核心显存保护机制：物理 Canvas 尺寸严格等于实际显示的 displayWidth * dpr，
+    // 彻底根除移动端 WebKit 4096px / 8192px 纹理截断白屏缺陷！
+    canvas.width = Math.round(displayWidth * dpr);
+    canvas.height = Math.round(displayHeight * dpr);
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     ctx.save();
-    ctx.scale(dpr, dpr);
+    // 统一将设计基准坐标系缩放至实际画布像素尺寸
+    ctx.scale(dpr * displayScale, dpr * displayScale);
 
     // 1. 铺设完整的古法纸张背景纹理
     drawPaperBackground(ctx, paperTheme, scrollTotalWidth, scrollTotalHeight);
@@ -208,44 +247,64 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
 
     // 3. 卷首（最右端）：经名双边框竖排签条
     const headerX = scrollTotalWidth - MARGIN_RIGHT - HEADER_WIDTH;
-    const headerY = MARGIN_TOP + 12;
-    const headerH = charsPerColumn * CELL_SIZE - 24;
+    const headerY = MARGIN_TOP + (isCompactMode ? 6 : 12);
+    const headerH = effectiveCharsPerColumn * CELL_SIZE - (isCompactMode ? 12 : 24);
 
     ctx.save();
     // 签条外框
     ctx.strokeStyle = gridColor;
     ctx.lineWidth = 2.0;
-    ctx.strokeRect(headerX + 16, headerY, HEADER_WIDTH - 32, headerH);
+    ctx.strokeRect(headerX + 10, headerY, HEADER_WIDTH - 20, headerH);
     // 签条内细框
     ctx.lineWidth = 0.8;
-    ctx.strokeRect(headerX + 20, headerY + 4, HEADER_WIDTH - 40, headerH - 8);
+    ctx.strokeRect(headerX + 14, headerY + 3, HEADER_WIDTH - 28, headerH - 6);
 
-    // 绘制经题大字（竖排楷体）
     ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = 'normal bold 22px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
 
-    // 经卷自右向左展开：经题在右列，译者在左列
-    const titleCenterX = headerX + HEADER_WIDTH / 2 + 12;
     const titleChars = title.split('');
-    const titleCharStep = Math.min(32, (headerH - 90) / (titleChars.length || 1));
-    const titleStartY = headerY + 45;
 
-    titleChars.forEach((ch, idx) => {
-      ctx.fillText(ch, titleCenterX, titleStartY + idx * titleCharStep);
-    });
+    if (isCompactMode) {
+      // 紧凑横卷模式：经名双列优雅排版
+      ctx.font = 'normal bold 16px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      const halfTitle = Math.ceil(titleChars.length / 2);
+      const titleCol1 = titleChars.slice(0, halfTitle);
+      const titleCol2 = titleChars.slice(halfTitle);
 
-    // 绘制译者/题跋（稍小号竖排，居左）
-    ctx.font = 'normal normal 13px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
-    ctx.globalAlpha = 0.75;
-    const authorCenterX = headerX + HEADER_WIDTH / 2 - 16;
-    const authorChars = authorOrTranslator.split('');
-    const authorCharStep = 18;
-    const authorStartY = headerY + 65;
-    authorChars.forEach((ch, idx) => {
-      ctx.fillText(ch, authorCenterX, authorStartY + idx * authorCharStep);
-    });
+      const col1X = headerX + HEADER_WIDTH / 2 + 15;
+      const col2X = headerX + HEADER_WIDTH / 2 - 10;
+      const step = Math.min(22, (headerH - 24) / (titleCol1.length || 1));
+      const startY = headerY + 16;
+
+      titleCol1.forEach((ch, idx) => {
+        ctx.fillText(ch, col1X, startY + idx * step);
+      });
+      titleCol2.forEach((ch, idx) => {
+        ctx.fillText(ch, col2X, startY + idx * step);
+      });
+    } else {
+      // 经典多行模式：单列经名 + 译者题跋
+      ctx.font = 'normal bold 22px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      const titleCenterX = headerX + HEADER_WIDTH / 2 + 12;
+      const titleCharStep = Math.min(32, (headerH - 90) / (titleChars.length || 1));
+      const titleStartY = headerY + 45;
+
+      titleChars.forEach((ch, idx) => {
+        ctx.fillText(ch, titleCenterX, titleStartY + idx * titleCharStep);
+      });
+
+      // 绘制译者/题跋（稍小号竖排，居左）
+      ctx.font = 'normal normal 13px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.globalAlpha = 0.75;
+      const authorCenterX = headerX + HEADER_WIDTH / 2 - 16;
+      const authorChars = authorOrTranslator.split('');
+      const authorCharStep = 18;
+      const authorStartY = headerY + 65;
+      authorChars.forEach((ch, idx) => {
+        ctx.fillText(ch, authorCenterX, authorStartY + idx * authorCharStep);
+      });
+    }
     ctx.restore();
 
     // 4. 经文主体：从右向左逐列乌丝栏
@@ -260,11 +319,11 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       ctx.lineWidth = 1.0;
       ctx.beginPath();
       ctx.moveTo(colX, MARGIN_TOP);
-      ctx.lineTo(colX, MARGIN_TOP + charsPerColumn * CELL_SIZE);
+      ctx.lineTo(colX, MARGIN_TOP + effectiveCharsPerColumn * CELL_SIZE);
       ctx.stroke();
 
-      for (let r = 0; r < charsPerColumn; r++) {
-        const charIdx = c * charsPerColumn + r;
+      for (let r = 0; r < effectiveCharsPerColumn; r++) {
+        const charIdx = c * effectiveCharsPerColumn + r;
         if (charIdx >= totalChars) break;
 
         const cellX = colX;
@@ -273,10 +332,10 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
         const isCurrent = charIdx === currentIndex;
         const record = writtenChars[charIdx];
 
-        // 绘制微细字格横横虚线底纹
+        // 绘制微细字格横虚线底纹
         ctx.save();
         ctx.strokeStyle = gridColor;
-        ctx.globalAlpha = 0.4;
+        ctx.globalAlpha = 0.45;
         ctx.setLineDash([2, 4]);
         ctx.strokeRect(
           cellX + CELL_PADDING,
@@ -295,17 +354,18 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
           renderMultipleStrokes(ctx, strokesToDraw, innerSize, innerSize, inkHex);
           ctx.restore();
         } else {
-          // 未抄写字格：半透明小楷名家底稿字模
+          // 未抄写字格：半透明小楷名家底稿字模（字号占比提升至 66%，大幅提高清晰度）
           ctx.save();
-          ctx.font = 'normal normal 38px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+          const charFontSize = Math.floor(CELL_SIZE * 0.66);
+          ctx.font = `normal normal ${charFontSize}px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           if (isCurrent) {
             ctx.fillStyle = '#C8963E';
-            ctx.globalAlpha = 0.55;
+            ctx.globalAlpha = 0.85; // 当前活动字高亮
           } else {
             ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
-            ctx.globalAlpha = 0.22;
+            ctx.globalAlpha = 0.35; // 底帖字模清晰可见，久看不累
           }
           ctx.fillText(
             ch,
@@ -319,55 +379,98 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
 
     // 5. 卷尾（最左侧）：回向文与朱砂篆刻印章
     const tailStartX = columnsStartX - numColumns * CELL_SIZE - TAIL_WIDTH;
-    const tailY = MARGIN_TOP + 12;
-    const tailH = charsPerColumn * CELL_SIZE - 24;
+    const tailY = MARGIN_TOP + (isCompactMode ? 6 : 12);
+    const tailH = effectiveCharsPerColumn * CELL_SIZE - (isCompactMode ? 12 : 24);
 
     ctx.save();
-    // 卷尾回向文（竖排排列）
     ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
-    ctx.font = 'normal normal 13px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.85;
 
-    // 回向文两列排版
-    const dedicationChars = dedicationText.split('');
-    const half = Math.ceil(dedicationChars.length / 2);
-    const col1Chars = dedicationChars.slice(0, half);
-    const col2Chars = dedicationChars.slice(half);
+    const cleanDedication = dedicationText.replace(/[，。]/g, '');
+    const dedicationChars = cleanDedication.split('');
 
-    const tailCol1X = tailStartX + TAIL_WIDTH - 38;
-    const tailCol2X = tailCol1X - 22;
-    const stepDedication = 18;
+    if (isCompactMode) {
+      // 紧凑横卷模式：回向文多列紧凑小楷 + 闲章
+      ctx.font = 'normal normal 12px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.globalAlpha = 0.85;
 
-    col1Chars.forEach((c, idx) => {
-      ctx.fillText(c, tailCol1X, tailY + 20 + idx * stepDedication);
-    });
-    col2Chars.forEach((c, idx) => {
-      ctx.fillText(c, tailCol2X, tailY + 20 + idx * stepDedication);
-    });
+      const charsPerCol = effectiveCharsPerColumn === 2 ? 4 : 5;
+      const colsCount = Math.ceil(dedicationChars.length / charsPerCol);
+      const stepY = Math.min(18, (tailH - 10) / charsPerCol);
+      const startX = tailStartX + TAIL_WIDTH - 22;
 
-    // 卷尾朱砂篆刻方印 (钤印)
-    const sealSize = 42;
-    const sealX = tailStartX + 20;
-    const sealY = tailY + tailH - sealSize - 20;
+      for (let ci = 0; ci < colsCount; ci++) {
+        const cx = startX - ci * 18;
+        const slice = dedicationChars.slice(ci * charsPerCol, (ci + 1) * charsPerCol);
+        slice.forEach((c, idx) => {
+          ctx.fillText(c, cx, tailY + 12 + idx * stepY);
+        });
+      }
 
-    drawSealOnCanvas(ctx, sealX, sealY, sealSize, {
-      text: sealText || '静心',
-      style: 'bai',
-      shape: 'square',
-      roughness: 0.2,
-    });
+      // 印章放置在最左侧
+      const sealSize = effectiveCharsPerColumn === 2 ? 30 : 36;
+      const sealX = tailStartX + 8;
+      const sealY = tailY + (tailH - sealSize) / 2;
+      drawSealOnCanvas(ctx, sealX, sealY, sealSize, {
+        text: sealText || '静心',
+        style: 'bai',
+        shape: 'square',
+        roughness: 0.2,
+      });
+    } else {
+      // 经典多行模式：回向文两列排版 + 方印
+      ctx.font = 'normal normal 13px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.globalAlpha = 0.85;
+
+      const rawDedicationChars = dedicationText.split('');
+      const half = Math.ceil(rawDedicationChars.length / 2);
+      const col1Chars = rawDedicationChars.slice(0, half);
+      const col2Chars = rawDedicationChars.slice(half);
+
+      const tailCol1X = tailStartX + TAIL_WIDTH - 38;
+      const tailCol2X = tailCol1X - 22;
+      const stepDedication = 18;
+
+      col1Chars.forEach((c, idx) => {
+        ctx.fillText(c, tailCol1X, tailY + 20 + idx * stepDedication);
+      });
+      col2Chars.forEach((c, idx) => {
+        ctx.fillText(c, tailCol2X, tailY + 20 + idx * stepDedication);
+      });
+
+      // 卷尾朱砂篆刻方印 (钤印)
+      const sealSize = 42;
+      const sealX = tailStartX + 20;
+      const sealY = tailY + tailH - sealSize - 20;
+
+      drawSealOnCanvas(ctx, sealX, sealY, sealSize, {
+        text: sealText || '静心',
+        style: 'bai',
+        shape: 'square',
+        roughness: 0.2,
+      });
+    }
     ctx.restore();
 
     ctx.restore();
   }, [
+    HEADER_WIDTH,
+    MARGIN_BOTTOM,
+    MARGIN_LEFT,
+    MARGIN_RIGHT,
+    MARGIN_TOP,
+    TAIL_WIDTH,
     authorOrTranslator,
-    charsPerColumn,
     content,
     currentIndex,
     dedicationText,
+    displayHeight,
+    displayScale,
+    displayWidth,
+    effectiveCharsPerColumn,
     inkHex,
+    isCompactMode,
     liveStrokes,
     numColumns,
     paperTheme,
@@ -380,7 +483,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     writtenChars,
   ]);
 
-  // 当经卷数据、选字或实时笔画变化时更新画布渲染（非每一帧死循环，0% 闲置开销）
+  // 当经卷数据、选字或实时笔画变化时更新画布渲染
   useEffect(() => {
     renderScroll();
   }, [renderScroll]);
@@ -420,13 +523,13 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       // 判断是否在经文网格区域内
       if (
         clickY >= MARGIN_TOP &&
-        clickY <= MARGIN_TOP + charsPerColumn * CELL_SIZE
+        clickY <= MARGIN_TOP + effectiveCharsPerColumn * CELL_SIZE
       ) {
         const row = Math.floor((clickY - MARGIN_TOP) / CELL_SIZE);
         const colOffset = columnsStartX - clickX;
         if (colOffset >= 0) {
           const col = Math.floor(colOffset / CELL_SIZE);
-          const targetIndex = col * charsPerColumn + row;
+          const targetIndex = col * effectiveCharsPerColumn + row;
           if (targetIndex >= 0 && targetIndex < totalChars) {
             onSelectChar(targetIndex);
           }
@@ -440,8 +543,8 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
   };
 
   // 当前正在书写格的几何坐标（用于 GPU 加速呼吸指示框）
-  const currentCol = Math.floor(currentIndex / charsPerColumn);
-  const currentRow = currentIndex % charsPerColumn;
+  const currentCol = Math.floor(currentIndex / effectiveCharsPerColumn);
+  const currentRow = currentIndex % effectiveCharsPerColumn;
   const columnsStartX = scrollTotalWidth - MARGIN_RIGHT - HEADER_WIDTH;
   const currentCellX = columnsStartX - (currentCol + 1) * CELL_SIZE;
   const currentCellY = MARGIN_TOP + currentRow * CELL_SIZE;
@@ -449,6 +552,25 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
+      {/* 排版模式切换快捷悬浮胶囊 */}
+      <div className="absolute top-2 left-2 z-20 flex items-center bg-stone-900/80 hover:bg-stone-800/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-stone-700/60 shadow-md transition-all">
+        <button
+          type="button"
+          onClick={() => {
+            setLayoutMode((prev) => {
+              if (prev === 'auto') return effectiveCharsPerColumn <= 3 ? 'classic' : 'large';
+              if (prev === 'large') return 'classic';
+              return 'large';
+            });
+          }}
+          className="text-[10px] sm:text-[11px] font-serif text-amber-200/90 hover:text-amber-100 flex items-center gap-1 active:scale-95"
+          title="切换卷轴排版：大字模式 / 全景八行"
+        >
+          <span>{effectiveCharsPerColumn <= 3 ? `大字模式 (${effectiveCharsPerColumn}行)` : '全景八行'}</span>
+          <span className="text-[9px] text-stone-400">切换</span>
+        </button>
+      </div>
+
       {/* 滚动容器 */}
       <div
         ref={containerRef}
@@ -476,7 +598,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
             className="shadow-2xl rounded-lg block"
           />
 
-          {/* 金色呼吸高亮框 (GPU 加速 CSS 动效，0% CPU 占用，按比例缩放适配) */}
+          {/* 金色呼吸高亮框 (GPU 加速 CSS 动效，按比例缩放适配) */}
           {hasValidCurrentCell && (
             <div
               className="absolute pointer-events-none rounded transition-all duration-300 ease-out z-10"

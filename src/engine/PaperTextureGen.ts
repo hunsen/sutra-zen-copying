@@ -517,14 +517,27 @@ export function drawPaperBackground(
   height: number
 ): void {
   ctx.save();
-  const pattern = getPaperPattern(ctx, theme);
-  if (pattern) {
-    ctx.fillStyle = pattern;
-    ctx.fillRect(0, 0, width, height);
-  } else {
-    // 降级使用纯底色
-    ctx.fillStyle = PAPER_THEMES[theme]?.bgColor || '#F4EFE6';
-    ctx.fillRect(0, 0, width, height);
+  // 1. 始终优先填满纯正的纸张底色，绝对保证绝不出现黑底或透明
+  const baseColor = PAPER_THEMES[theme]?.bgColor || '#F4EFE6';
+  ctx.fillStyle = baseColor;
+  ctx.fillRect(0, 0, width, height);
+
+  try {
+    const textureCanvas = generatePaperTexture(theme, 512, 512);
+    // 2. 如果绘制区域在 512x512 以内（如书写台 PAD_SIZE = 380），直接使用 drawImage
+    // 这不仅渲染速度更快，且 100% 避开 Safari/WebKit 对离屏 canvas 调用 createPattern 偶尔产生黑屏的系统级缺陷
+    if (width <= 512 && height <= 512) {
+      ctx.drawImage(textureCanvas as CanvasImageSource, 0, 0, width, height);
+    } else {
+      // 3. 超长长卷使用平铺 pattern，若模式创建失败则已保留上面的纯底色
+      const pattern = ctx.createPattern(textureCanvas as CanvasImageSource, 'repeat');
+      if (pattern) {
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, 0, width, height);
+      }
+    }
+  } catch (err) {
+    console.warn('平铺纸张纹理异常，保留纯底色:', err);
   }
   ctx.restore();
 }

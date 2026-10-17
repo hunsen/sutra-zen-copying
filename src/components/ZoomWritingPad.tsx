@@ -122,7 +122,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
 
   // 字模辅助与设置状态
   const [showGuideChar, setShowGuideChar] = useState(true);
-  const [guideOpacity, setGuideOpacity] = useState(0.28); // 默认 28% 透明度
+  const [guideOpacity, setGuideOpacity] = useState(0.35); // 默认 35% 透明度，清晰温润容易辨识
 
   // 走纸模式：'smart'（智能笔画圆满走纸，推荐）| 'manual'（手动/手势走纸）| 'timed'（纯定时走纸）
   const [advanceMode, setAdvanceMode] = useState<AdvanceMode>('smart');
@@ -301,7 +301,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
 
       // 文字透明度与颜色（跟随推荐墨色，柔和半透明显示）
       ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
-      ctx.globalAlpha = Math.min(0.6, Math.max(0.1, guideOpacity));
+      ctx.globalAlpha = Math.min(0.85, Math.max(0.08, guideOpacity));
       // 垂直居中微调（中文字符光学偏置 +4px）
       ctx.fillText(currentChar, cx, cy + 4);
       ctx.restore();
@@ -321,7 +321,9 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
     canvas.width = PAD_SIZE * dpr;
     canvas.height = PAD_SIZE * dpr;
 
-    const ctx = canvas.getContext('2d', { desynchronized: true });
+    // 注意：严禁在具有底层叠加透明度的图层上使用 desynchronized: true，
+    // 否则在 iOS WebKit 与部分 Android 渲染合成器上会将透明通道直接渲染为纯黑！
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     ctx.save();
@@ -339,6 +341,15 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
   // 背景与字模更新时重新渲染底层
   useEffect(() => {
     renderBackgroundLayer();
+  }, [renderBackgroundLayer]);
+
+  // 当系统/网络楷体字体就绪时，立即重绘确保字模即刻显现
+  useEffect(() => {
+    if (typeof document !== 'undefined' && (document as unknown as { fonts?: { ready: Promise<void> } }).fonts) {
+      (document as unknown as { fonts: { ready: Promise<void> } }).fonts.ready.then(() => {
+        renderBackgroundLayer();
+      });
+    }
   }, [renderBackgroundLayer]);
 
   // 笔画列表变更时重新渲染顶层
@@ -647,9 +658,9 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
           {showGuideChar && (
             <input
               type="range"
-              min="0.12"
-              max="0.55"
-              step="0.01"
+              min="0.10"
+              max="0.70"
+              step="0.02"
               value={guideOpacity}
               onChange={(e) => setGuideOpacity(parseFloat(e.target.value))}
               className="w-10 sm:w-14 h-1 bg-stone-300 rounded-lg appearance-none cursor-pointer accent-amber-800"
@@ -661,10 +672,11 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
 
       {/* 核心书写画布区域（自适应方格，按可用宽高自适应缩放） */}
       <div
-        className={`relative w-full aspect-square max-w-[min(380px,88vw,calc(100vh-250px))] max-h-[min(380px,88vw,calc(100vh-250px))] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 touch-none bg-stone-100 transition-colors duration-200 flex-shrink-0 ${
+        className={`relative w-full aspect-square max-w-[min(380px,88vw,calc(100vh-250px))] max-h-[min(380px,88vw,calc(100vh-250px))] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 touch-none transition-colors duration-200 flex-shrink-0 ${
           isDrawing ? 'border-amber-700/60 ring-2 ring-amber-500/20' : 'border-stone-300/80'
         }`}
         style={{
+          backgroundColor: themeConfig.bgColor,
           boxShadow:
             '0 20px 25px -5px rgba(40, 30, 20, 0.12), 0 8px 10px -6px rgba(40, 30, 20, 0.08)',
         }}
@@ -672,7 +684,8 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
         {/* 底层画布：宣纸纹理 + 米字格 + 楷体字模 */}
         <canvas
           ref={bgCanvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ width: '100%', height: '100%' }}
+          className="absolute inset-0 w-full h-full pointer-events-none block"
         />
 
         {/* 顶层手写交互画布：高分屏抗锯齿矢量笔墨 */}
@@ -682,7 +695,8 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerCancel}
-          className="absolute inset-0 w-full h-full cursor-crosshair z-10"
+          style={{ width: '100%', height: '100%' }}
+          className="absolute inset-0 w-full h-full cursor-crosshair z-10 block"
         />
 
         {/* 停笔自动走纸倒计时环形视觉反馈（悬浮在右上角） */}
