@@ -9,6 +9,7 @@
 // ============================================================================
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import {
   CopyingSession,
   WrittenCharRecord,
@@ -423,6 +424,7 @@ export const App: React.FC = () => {
 
   // 模态框关闭处理记忆化，防止每秒倒计时触发重渲染
   const handleCloseIncense = useCallback(() => setShowIncenseModal(false), []);
+  const handleOpenIncense = useCallback(() => setShowIncenseModal(true), []);
   const handleCloseExport = useCallback(() => setShowExportModal(false), []);
   const handleCloseLibrary = useCallback(() => setShowLibraryModal(false), []);
   const handleOpenLibrary = useCallback(() => setShowLibraryModal(true), []);
@@ -431,6 +433,7 @@ export const App: React.FC = () => {
   const currentChar = sutra.content[currentIndex] || '观';
   const initialStrokesForCurrent = writtenChars[currentIndex]?.strokes ?? EMPTY_STROKES;
   const themeBgColor = PAPER_THEMES[paperTheme]?.bgColor || '#F4EFE6';
+  const isDarkTheme = paperTheme === 'ciqing' || paperTheme === 'red-gold';
 
   return (
     <div
@@ -441,6 +444,16 @@ export const App: React.FC = () => {
         zenAudio.ensureContext();
       }}
     >
+      {/* 禅房书案暖光与四周柔和景深晕影 */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-700"
+        style={{
+          background: isDarkTheme
+            ? 'radial-gradient(circle at 50% 42%, rgba(212, 175, 55, 0.07) 0%, rgba(0, 0, 0, 0.28) 100%)'
+            : 'radial-gradient(circle at 50% 42%, rgba(255, 248, 232, 0.32) 0%, rgba(65, 48, 30, 0.09) 100%)',
+        }}
+      />
+
       {/* 顶部微光禅意胶囊导航栏 */}
       <TopZenCapsule
         title={sutra.title}
@@ -458,13 +471,21 @@ export const App: React.FC = () => {
         onToggleMute={handleToggleMute}
         onOpenLibrary={handleOpenLibrary}
         onOpenExport={handleOpenExport}
+        onOpenIncense={handleOpenIncense}
       />
 
       {/* 主工作区：响应式双区联动布局（适配移动端横竖屏与桌面/平板双模式） */}
-      <main className="w-full h-full flex flex-col landscape:flex-row lg:flex-row pt-12 sm:pt-14 pb-1 sm:pb-2 px-1.5 sm:px-4 gap-1.5 sm:gap-4 overflow-hidden">
+      <main className="relative z-10 w-full h-full flex flex-col landscape:flex-row lg:flex-row pt-12 sm:pt-14 pb-1 sm:pb-2 px-1.5 sm:px-4 gap-1.5 sm:gap-4 overflow-hidden">
         {/* 左区：竖排从右至左全景手卷预览与浏览区（宽屏下解除最大高度，占满全部剩余空间） */}
-        <section
-          className={`relative rounded-xl sm:rounded-2xl overflow-hidden border border-stone-800/20 shadow-inner flex items-center justify-center p-1 sm:p-2 transition-all duration-300 ${
+        <motion.section
+          initial={{ opacity: 0, x: -16, scale: 0.985 }}
+          animate={{
+            opacity: 1,
+            x: 0,
+            scale: showIncenseModal ? 0.985 : 1,
+          }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          className={`relative rounded-xl sm:rounded-2xl overflow-hidden border border-stone-800/20 shadow-inner flex items-center justify-center p-1 sm:p-2 transition-colors duration-300 ${
             isScrollExpandedMobile
               ? 'flex-1 w-full h-full'
               : 'flex-none h-[26vh] min-h-[145px] max-h-[200px] landscape:h-full landscape:min-h-0 landscape:max-h-none landscape:flex-1 landscape:w-auto lg:h-full lg:min-h-0 lg:max-h-none lg:flex-1 lg:w-auto'
@@ -513,11 +534,18 @@ export const App: React.FC = () => {
               }
             }}
           />
-        </section>
+        </motion.section>
 
         {/* 右区：黄金落笔区——手指专属放大米字格书写台（宽屏下紧凑停靠 ~410px，留出最大区域给长卷） */}
-        <section
-          className={`flex flex-col items-center justify-center relative p-1 sm:p-4 overflow-x-hidden overflow-y-auto no-scrollbar transition-all duration-300 ${
+        <motion.section
+          initial={{ opacity: 0, y: 16, scale: 0.98 }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: showIncenseModal ? 0.985 : 1,
+          }}
+          transition={{ duration: 0.65, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          className={`flex flex-col items-center justify-center relative p-1 sm:p-4 overflow-x-hidden overflow-y-auto no-scrollbar transition-colors duration-300 ${
             isScrollExpandedMobile
               ? 'hidden'
               : 'flex-1 min-h-0 landscape:h-full landscape:flex-none landscape:w-[410px] xl:w-[440px] lg:h-full lg:flex-none lg:w-[420px]'
@@ -551,7 +579,7 @@ export const App: React.FC = () => {
               }
             }}
           />
-        </section>
+        </motion.section>
       </main>
 
       {/* 仪式感与功能模态框 */}

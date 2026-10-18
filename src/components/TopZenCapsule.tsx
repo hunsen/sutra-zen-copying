@@ -2,14 +2,15 @@
 // 「静心抄经」顶部微光禅意胶囊导航栏
 // src/components/TopZenCapsule.tsx
 // 悬浮微光胶囊设计：
-// 1. 书写运笔时自动淡隐降至 25% 不透明度，移入或停笔恢复，零视觉干扰
-// 2. 纸墨主题快速切换（宣纸、磁青、红笺、竹纸）
-// 3. 抄经进度与累计静心时长实时反馈
-// 4. 音效静音控制、藏经阁与钤印导出入口
+// 1. 书写运笔时平滑微浮隐退至 25% 不透明度，移入或停笔恢复，零视觉干扰
+// 2. 纸墨主题快速切换（宣纸、磁青、红笺、竹纸）与 Framer Motion 弹簧浮层
+// 3. 底部流金进度微光条 + 抄经进度与累计静心时长实时反馈
+// 4. 焚香调息重温入口、音效静音控制、藏经阁与钤印导出入口
 // ============================================================================
 
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   PaperTheme,
   InkType,
@@ -26,6 +27,7 @@ import {
   Download,
   Scroll,
   Paintbrush,
+  Wind,
 } from 'lucide-react';
 
 export interface TopZenCapsuleProps {
@@ -59,6 +61,8 @@ export interface TopZenCapsuleProps {
   onOpenLibrary?: () => void;
   /** 点击导出长卷回调 */
   onOpenExport?: () => void;
+  /** 点击重温焚香调息仪式回调 */
+  onOpenIncense?: () => void;
 }
 
 /**
@@ -92,6 +96,7 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
   onToggleMute,
   onOpenLibrary,
   onOpenExport,
+  onOpenIncense,
 }) => {
   const [showThemeMenu, setShowThemeMenu] = useState(false);
 
@@ -101,14 +106,29 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
       : 0;
 
   return (
-    <div
-      className={`fixed top-2 sm:top-3 inset-x-0 mx-auto w-fit max-w-[96vw] z-50 transition-opacity duration-300 ${
-        isWriting ? 'opacity-25 hover:opacity-100' : 'opacity-100'
-      }`}
+    <motion.div
+      initial={{ opacity: 0, y: -18 }}
+      animate={{
+        opacity: isWriting ? 0.24 : 1,
+        y: isWriting ? -3 : 0,
+      }}
+      whileHover={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-2 sm:top-3 inset-x-0 mx-auto w-fit max-w-[96vw] z-50"
     >
-      <div className="relative flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 border border-stone-700/60 shadow-2xl rounded-full text-stone-200 transition-colors whitespace-nowrap flex-nowrap">
+      <div className="relative flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 border border-stone-700/60 shadow-2xl rounded-full text-stone-200 transition-colors whitespace-nowrap flex-nowrap overflow-hidden">
         {/* 背景微光毛玻璃层（移入子元素避免成为外部 fixed 浮层的包含块） */}
         <div className="absolute inset-0 -z-10 rounded-full bg-stone-900/90 hover:bg-stone-900/95 backdrop-blur-xl pointer-events-none transition-colors" />
+
+        {/* 底部流金进度微光条 */}
+        <div className="absolute bottom-0 inset-x-4 h-[1.5px] bg-stone-800/60 overflow-hidden pointer-events-none rounded-full">
+          <motion.div
+            className="h-full bg-gradient-to-r from-amber-600/60 via-amber-400 to-amber-300"
+            initial={{ width: 0 }}
+            animate={{ width: `${percent}%` }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </div>
 
         {/* 藏经阁入口 */}
         <button
@@ -118,7 +138,9 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
           title="藏经阁：选经、自建字帖与功德簿"
         >
           <BookOpen size={14} className="flex-shrink-0" />
-          <span className="max-w-[70px] sm:max-w-[100px] md:max-w-[140px] truncate whitespace-nowrap">{title}</span>
+          <span className="max-w-[70px] sm:max-w-[100px] md:max-w-[140px] truncate whitespace-nowrap">
+            {title}
+          </span>
         </button>
 
         <div className="w-[1px] h-3.5 bg-stone-700/80 flex-shrink-0" />
@@ -142,162 +164,208 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
         </div>
 
         {/* 纸墨笔参数弹出浮层与遮罩（使用 createPortal 挂载至 document.body，彻底脱离 backdrop-filter 祖先包含块） */}
-        {showThemeMenu &&
-          typeof document !== 'undefined' &&
+        {typeof document !== 'undefined' &&
           createPortal(
-            <>
-              {/* 外部遮罩用于点击关闭 */}
-              <div
-                className="fixed inset-0 z-40 bg-black/20"
-                onClick={() => setShowThemeMenu(false)}
-              />
-
-              {/* 纸墨笔参数弹出浮层（移动端居中贴合视口，桌面端吸附顶栏下方居中，不受胶囊包含块与 backdrop-filter 裁切） */}
-              <div
-                className="fixed inset-x-3 top-14 mx-auto w-auto max-w-xs sm:fixed sm:inset-x-auto sm:top-14 sm:left-1/2 sm:-translate-x-1/2 sm:w-72 p-3 sm:p-3.5 bg-stone-900 border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-3 font-serif max-h-[calc(100vh-80px)] overflow-y-auto no-scrollbar animate-fade-in"
-                style={{ backgroundColor: 'rgba(28, 25, 23, 0.98)' }}
-                onPointerDown={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between pb-1.5 border-b border-stone-800">
-                  <span className="text-xs font-medium text-amber-200">文房四宝与字号</span>
-                  <button
-                    type="button"
+            <AnimatePresence>
+              {showThemeMenu && (
+                <>
+                  {/* 外部遮罩用于点击关闭 */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="fixed inset-0 z-40 bg-black/25"
                     onClick={() => setShowThemeMenu(false)}
-                    className="text-stone-400 hover:text-stone-200 text-xs px-1.5 py-0.5 rounded hover:bg-stone-800"
-                    title="关闭"
+                  />
+
+                  {/* 纸墨笔参数弹出浮层 */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    className="fixed inset-x-3 top-14 mx-auto w-auto max-w-xs sm:fixed sm:inset-x-auto sm:top-14 sm:left-1/2 sm:-translate-x-1/2 sm:w-72 p-3 sm:p-3.5 bg-stone-900 border border-stone-700/80 rounded-2xl shadow-2xl z-50 flex flex-col gap-3 font-serif max-h-[calc(100vh-80px)] overflow-y-auto no-scrollbar"
+                    style={{ backgroundColor: 'rgba(28, 25, 23, 0.98)' }}
+                    onPointerDown={(e) => e.stopPropagation()}
                   >
-                    ✕
-                  </button>
-                </div>
-
-                <div>
-                  <span className="text-[11px] text-stone-400 tracking-wider">古典纸张</span>
-                  <div className="grid grid-cols-2 gap-1.5 mt-1.5">
-                    {(Object.keys(PAPER_THEMES) as PaperTheme[]).map((thm) => {
-                      const cfg = PAPER_THEMES[thm];
-                      const active = thm === paperTheme;
-                      return (
-                        <button
-                          key={thm}
-                          type="button"
-                          onClick={() => {
-                            onSelectTheme(thm);
-                          }}
-                          className={`flex items-center gap-2 p-1.5 rounded-lg text-xs transition-all border ${
-                            active
-                              ? 'bg-amber-950/60 border-amber-500/80 text-amber-200'
-                              : 'bg-stone-800/60 border-transparent hover:border-stone-600 text-stone-300'
-                          }`}
-                        >
-                          <span
-                            className="w-3.5 h-3.5 rounded-full border border-stone-500/50 flex-shrink-0"
-                            style={{ backgroundColor: cfg.bgColor }}
-                          />
-                          <span className="truncate">{cfg.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-[11px] text-stone-400 tracking-wider">传统墨色</span>
-                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mt-1.5">
-                    {(['black', 'gold', 'cinnabar'] as InkType[]).map((ink) => {
-                      const active = ink === inkType;
-                      const labels: Record<InkType, string> = {
-                        black: '松烟墨',
-                        gold: '泥金墨',
-                        cinnabar: '朱砂墨',
-                      };
-                      return (
-                        <button
-                          key={ink}
-                          type="button"
-                          onClick={() => {
-                            onSelectInk(ink);
-                          }}
-                          className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 px-1 sm:px-2 rounded-lg text-xs transition-all border min-w-0 whitespace-nowrap ${
-                            active
-                              ? 'bg-amber-950/60 border-amber-500/80 text-amber-200'
-                              : 'bg-stone-800/60 border-transparent hover:border-stone-600 text-stone-300'
-                          }`}
-                        >
-                          <span
-                            className="w-2.5 h-2.5 rounded-full border border-stone-500/40 flex-shrink-0"
-                            style={{ backgroundColor: INK_COLORS[ink] }}
-                          />
-                          <span className="truncate">{labels[ink]}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 毛笔笔触粗细 */}
-                {onSelectBrushThickness && (
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] text-stone-400 tracking-wider">
-                      <span className="flex items-center gap-1">
-                        <Paintbrush size={11} className="text-amber-400" />
-                        <span>笔触字号粗细</span>
+                    <div className="flex items-center justify-between pb-1.5 border-b border-stone-800">
+                      <span className="text-xs font-medium text-amber-200">
+                        文房四宝与字号
                       </span>
-                      <span className="text-amber-300 font-mono">{brushThickness}px</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowThemeMenu(false)}
+                        className="text-stone-400 hover:text-stone-200 text-xs px-1.5 py-0.5 rounded hover:bg-stone-800"
+                        title="关闭"
+                      >
+                        ✕
+                      </button>
                     </div>
-                    <div className="grid grid-cols-4 gap-1 mt-1.5">
-                      {BRUSH_PRESETS.map((bp) => {
-                        const active = brushThickness === bp.thickness;
-                        return (
-                          <button
-                            key={bp.id}
-                            type="button"
-                            onClick={() => onSelectBrushThickness(bp.thickness)}
-                            className={`py-1.5 px-1 rounded-lg text-xs transition-all border flex flex-col items-center justify-center active:scale-95 ${
-                              active
-                                ? 'bg-amber-950/80 border-amber-500/80 text-amber-200 ring-1 ring-amber-500/50'
-                                : 'bg-stone-800/60 border-transparent hover:border-stone-700 text-stone-400 hover:text-stone-200'
-                            }`}
-                          >
-                            <span className="font-medium text-[11px] leading-tight">{bp.name}</span>
-                            <span className="text-[9px] text-stone-500 mt-0.5">{bp.thickness}px</span>
-                          </button>
-                        );
-                      })}
+
+                    <div>
+                      <span className="text-[11px] text-stone-400 tracking-wider">
+                        古典纸张
+                      </span>
+                      <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+                        {(Object.keys(PAPER_THEMES) as PaperTheme[]).map(
+                          (thm) => {
+                            const cfg = PAPER_THEMES[thm];
+                            const active = thm === paperTheme;
+                            return (
+                              <button
+                                key={thm}
+                                type="button"
+                                onClick={() => {
+                                  onSelectTheme(thm);
+                                }}
+                                className={`flex items-center gap-2 p-1.5 rounded-lg text-xs transition-all border ${
+                                  active
+                                    ? 'bg-amber-950/60 border-amber-500/80 text-amber-200'
+                                    : 'bg-stone-800/60 border-transparent hover:border-stone-600 text-stone-300'
+                                }`}
+                              >
+                                <span
+                                  className="w-3.5 h-3.5 rounded-full border border-stone-500/50 flex-shrink-0"
+                                  style={{ backgroundColor: cfg.bgColor }}
+                                />
+                                <span className="truncate">{cfg.name}</span>
+                              </button>
+                            );
+                          }
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </>,
+
+                    <div>
+                      <span className="text-[11px] text-stone-400 tracking-wider">
+                        传统墨色
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mt-1.5">
+                        {(['black', 'gold', 'cinnabar'] as InkType[]).map(
+                          (ink) => {
+                            const active = ink === inkType;
+                            const labels: Record<InkType, string> = {
+                              black: '松烟墨',
+                              gold: '泥金墨',
+                              cinnabar: '朱砂墨',
+                            };
+                            return (
+                              <button
+                                key={ink}
+                                type="button"
+                                onClick={() => {
+                                  onSelectInk(ink);
+                                }}
+                                className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 px-1 sm:px-2 rounded-lg text-xs transition-all border min-w-0 whitespace-nowrap ${
+                                  active
+                                    ? 'bg-amber-950/60 border-amber-500/80 text-amber-200'
+                                    : 'bg-stone-800/60 border-transparent hover:border-stone-600 text-stone-300'
+                                }`}
+                              >
+                                <span
+                                  className="w-2.5 h-2.5 rounded-full border border-stone-500/40 flex-shrink-0"
+                                  style={{ backgroundColor: INK_COLORS[ink] }}
+                                />
+                                <span className="truncate">{labels[ink]}</span>
+                              </button>
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 毛笔笔触粗细 */}
+                    {onSelectBrushThickness && (
+                      <div>
+                        <div className="flex items-center justify-between text-[11px] text-stone-400 tracking-wider">
+                          <span className="flex items-center gap-1">
+                            <Paintbrush size={11} className="text-amber-400" />
+                            <span>笔触字号粗细</span>
+                          </span>
+                          <span className="text-amber-300 font-mono tabular-nums">
+                            {brushThickness}px
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-1 mt-1.5">
+                          {BRUSH_PRESETS.map((bp) => {
+                            const active = brushThickness === bp.thickness;
+                            return (
+                              <button
+                                key={bp.id}
+                                type="button"
+                                onClick={() =>
+                                  onSelectBrushThickness(bp.thickness)
+                                }
+                                className={`py-1.5 px-1 rounded-lg text-xs transition-all border flex flex-col items-center justify-center active:scale-95 ${
+                                  active
+                                    ? 'bg-amber-950/80 border-amber-500/80 text-amber-200 ring-1 ring-amber-500/50'
+                                    : 'bg-stone-800/60 border-transparent hover:border-stone-700 text-stone-400 hover:text-stone-200'
+                                }`}
+                              >
+                                <span className="font-medium text-[11px] leading-tight">
+                                  {bp.name}
+                                </span>
+                                <span className="text-[9px] text-stone-500 mt-0.5 tabular-nums">
+                                  {bp.thickness}px
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>,
             document.body
           )}
 
         <div className="w-[1px] h-3.5 bg-stone-700/80 flex-shrink-0" />
 
         {/* 抄经进度指示 */}
-        <div className="flex items-center gap-1 text-[11px] sm:text-xs text-stone-300 font-serif whitespace-nowrap flex-shrink-0">
-          <Scroll size={12} className="text-amber-400 hidden sm:inline flex-shrink-0" />
+        <div className="flex items-center gap-1 text-[11px] sm:text-xs text-stone-300 font-serif whitespace-nowrap flex-shrink-0 tabular-nums">
+          <Scroll
+            size={12}
+            className="text-amber-400 hidden sm:inline flex-shrink-0"
+          />
           <span>
             {Math.min(currentIndex + 1, totalChars)}/{totalChars}
           </span>
-          <span className="text-stone-400 text-[10px] hidden xs:inline">({percent}%)</span>
+          <span className="text-stone-400 text-[10px] hidden xs:inline">
+            ({percent}%)
+          </span>
         </div>
 
         {/* 静心计时器（大屏展示，手机端紧凑布局） */}
         <div className="hidden md:flex items-center gap-1 text-xs text-stone-300 font-serif whitespace-nowrap flex-shrink-0">
           <div className="w-[1px] h-3.5 bg-stone-700/80 mr-1" />
           <Clock size={12} className="text-amber-400/80 flex-shrink-0" />
-          <span className="font-mono text-[11px] tracking-wider text-amber-100">
+          <span className="font-mono tabular-nums text-[11px] tracking-wider text-amber-100">
             {formatDuration(durationSec)}
           </span>
         </div>
 
         <div className="w-[1px] h-3.5 bg-stone-700/80 flex-shrink-0" />
 
+        {/* 焚香调息仪式入口 */}
+        {onOpenIncense && (
+          <button
+            type="button"
+            onClick={onOpenIncense}
+            className="p-1 rounded-full hover:bg-stone-800 text-stone-400 hover:text-amber-200 transition-colors active:scale-95"
+            title="焚香调息仪式"
+          >
+            <Wind size={14} />
+          </button>
+        )}
+
         {/* 音效开关 */}
         <button
           type="button"
           onClick={onToggleMute}
-          className="p-1 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
+          className="p-1 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors active:scale-95"
           title={isMuted ? '解除静音' : '禅音静音'}
         >
           {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
@@ -314,6 +382,6 @@ export const TopZenCapsule: React.FC<TopZenCapsuleProps> = ({
           <span className="hidden sm:inline">钤印导出</span>
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };

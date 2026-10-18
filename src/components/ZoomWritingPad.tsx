@@ -10,6 +10,7 @@
 // ============================================================================
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   BrushStroke,
   WrittenCharRecord,
@@ -662,17 +663,28 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
           >
             第 {charIndex + 1}/{totalChars}
           </span>
-          <span
-            className={`text-lg sm:text-xl font-serif font-bold tracking-wider ${
-              isDarkPaper ? 'text-amber-100' : 'text-stone-900'
-            }`}
-          >
-            「{currentChar}」
-          </span>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={`${charIndex}-${currentChar}`}
+              initial={{ opacity: 0, x: 8, filter: 'blur(2px)' }}
+              animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, x: -8, filter: 'blur(2px)' }}
+              transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+              className={`inline-block text-lg sm:text-xl font-serif font-bold tracking-wider ${
+                isDarkPaper ? 'text-amber-100' : 'text-stone-900'
+              }`}
+            >
+              「{currentChar}」
+            </motion.span>
+          </AnimatePresence>
 
           {/* 实时笔画状态胶囊徽标 */}
-          <span
-            className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-serif font-medium transition-all flex items-center gap-1 ${
+          <motion.span
+            key={isComplete ? 'complete' : 'writing'}
+            initial={isComplete ? { scale: 0.9 } : false}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 360, damping: 20 }}
+            className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-serif font-medium transition-all flex items-center gap-1 tabular-nums ${
               isComplete
                 ? 'bg-amber-100 text-amber-900 border border-amber-400 shadow-sm animate-pulse-slow'
                 : isDarkPaper
@@ -687,7 +699,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
                 ? `圆满 (${currentStrokeCount}/${expectedStrokes})`
                 : `${currentStrokeCount}/${expectedStrokes}笔`}
             </span>
-          </span>
+          </motion.span>
         </div>
 
         {/* 字模透明度与笔触粗细控制胶囊 */}
@@ -861,6 +873,14 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
           style={{ width: '100%', height: '100%' }}
           className="absolute inset-0 w-full h-full cursor-crosshair z-10 block"
         />
+
+        {/* 单字圆满落款金韵涟漪反馈 */}
+        {isComplete && (
+          <div
+            key={`ripple-${charIndex}`}
+            className="pointer-events-none absolute inset-3 rounded-xl border border-amber-500/60 ink-complete-ripple z-15"
+          />
+        )}
 
         {/* 停笔自动走纸倒计时环形视觉反馈（悬浮在右上角） */}
         {countdownProgress > 0 && countdownProgress < 1.0 && (

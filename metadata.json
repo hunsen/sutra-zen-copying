@@ -1,0 +1,8 @@
+{
+  "name": "「静心抄经」- 跨平台离线手写书法长卷",
+  "description": "专为平板与触控设计的沉浸式离线毛笔书法经卷抄写应用，包含全景竖排长卷、米字格临摹台、焚香静心仪式与超清长卷导出。",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

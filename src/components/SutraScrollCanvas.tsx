@@ -639,26 +639,54 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
             className="shadow-2xl rounded-lg block"
           />
 
-          {/* 金色呼吸高亮框 (GPU 加速 CSS 动效，按比例缩放适配) */}
+          {/* 金色呼吸高亮框 (GPU 加速流光与四角泥金折角纹，平滑走纸追踪) */}
           {hasValidCurrentCell && (
             <div
-              className="absolute pointer-events-none rounded transition-all duration-300 ease-out z-10"
+              className="absolute pointer-events-none z-10 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{
                 left: `${(currentCellX + CELL_PADDING) * displayScale}px`,
                 top: `${(currentCellY + CELL_PADDING) * displayScale}px`,
                 width: `${(CELL_SIZE - CELL_PADDING * 2) * displayScale}px`,
                 height: `${(CELL_SIZE - CELL_PADDING * 2) * displayScale}px`,
-                border: '2px solid rgba(218, 165, 32, 0.95)',
-                boxShadow: '0 0 14px 2px rgba(238, 205, 95, 0.65)',
-                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               }}
-            />
+            >
+              {/* 内层呼吸金框 */}
+              <div
+                className="w-full h-full rounded-[3px] zen-cell-active"
+                style={{
+                  border: '1.5px solid rgba(218, 165, 32, 0.92)',
+                  boxShadow:
+                    '0 0 18px 2px rgba(238, 205, 95, 0.52), inset 0 0 10px rgba(238, 205, 95, 0.18)',
+                }}
+              />
+              {/* 四角古籍泥金折角饰线 */}
+              <span className="absolute -top-[2px] -left-[2px] w-2 h-2 border-t-2 border-l-2 border-amber-400 rounded-tl-[2px]" />
+              <span className="absolute -top-[2px] -right-[2px] w-2 h-2 border-t-2 border-r-2 border-amber-400 rounded-tr-[2px]" />
+              <span className="absolute -bottom-[2px] -left-[2px] w-2 h-2 border-b-2 border-l-2 border-amber-400 rounded-bl-[2px]" />
+              <span className="absolute -bottom-[2px] -right-[2px] w-2 h-2 border-b-2 border-r-2 border-amber-400 rounded-br-[2px]" />
+            </div>
           )}
         </div>
       </div>
 
+      {/* 左右卷轴边缘柔和景深暗角（模拟长卷展卷立体感） */}
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 w-6 sm:w-10 z-10"
+        style={{
+          background:
+            'linear-gradient(to right, rgba(20, 18, 16, 0.16), rgba(20, 18, 16, 0))',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 w-6 sm:w-10 z-10"
+        style={{
+          background:
+            'linear-gradient(to left, rgba(20, 18, 16, 0.16), rgba(20, 18, 16, 0))',
+        }}
+      />
+
       {/* 卷首与卷尾导航提示小浮标（大屏展示，手机端隐藏避免挤占空间） */}
-      <div className="hidden sm:block absolute bottom-2 left-4 pointer-events-none text-xs font-serif text-stone-500/80 bg-stone-900/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-stone-600/30">
+      <div className="hidden sm:block absolute bottom-2 left-4 z-20 pointer-events-none text-xs font-serif text-stone-300/85 bg-stone-900/55 backdrop-blur-md px-3 py-1 rounded-full border border-stone-700/40 shadow-sm">
         <span>从右至左展开长卷 · 双指/单指左右滑动 · 点击字格可重写</span>
       </div>
     </div>
