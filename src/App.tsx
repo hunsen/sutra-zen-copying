@@ -444,6 +444,22 @@ export const App: React.FC = () => {
         zenAudio.ensureContext();
       }}
     >
+      {/* 移动端 WebFont 预热隐藏节点：强制 iOS WebKit / Android Blink 立即下载并栅格化楷体与篆体字形 */}
+      <div
+        aria-hidden="true"
+        className="fixed -top-[9999px] -left-[9999px] opacity-0 pointer-events-none select-none"
+      >
+        <span style={{ fontFamily: '"ZenKai", serif', fontWeight: 'normal' }}>
+          觀自在菩薩行深般若波羅蜜多時照見五蘊皆空度一切苦厄
+        </span>
+        <span style={{ fontFamily: '"ZenKai", serif', fontWeight: 'bold' }}>
+          般若波羅蜜多心經唐玄奘法師譯
+        </span>
+        <span style={{ fontFamily: '"AncientSeal", serif', fontWeight: 'normal' }}>
+          靜心吉祥如意
+        </span>
+      </div>
+
       {/* 禅房书案暖光与四周柔和景深晕影 */}
       <div
         className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-700"

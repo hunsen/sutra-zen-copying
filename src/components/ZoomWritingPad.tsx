@@ -36,6 +36,7 @@ import {
   isCharacterComplete,
 } from '../data/chineseStrokeData';
 import { toTraditional } from '../data/builtInSutras';
+import { useZenFontsReady } from '../engine/fontLoader';
 import {
   RotateCcw,
   Trash2,
@@ -106,6 +107,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
   // 画布 DOM 引用（双层设计：底层为纸张背景与字模，顶层为笔墨轨迹）
   const bgCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const strokeCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fontVersion = useZenFontsReady();
 
   // 毛笔粗细状态（支持外部受控与内部自管）
   const [localThickness, setLocalThickness] = useState<number>(brushThickness || 14);
@@ -338,7 +340,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
     }
 
     ctx.restore();
-  }, [guideOpacity, paperTheme, showGuideChar, currentChar, themeConfig]);
+  }, [guideOpacity, paperTheme, showGuideChar, currentChar, themeConfig, fontVersion]);
 
   /**
    * 重绘顶层手写笔迹图层
@@ -368,19 +370,10 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
     ctx.restore();
   }, [inkHex, strokes]);
 
-  // 背景与字模更新时重新渲染底层
+  // 背景与字模更新或移动端楷体 WebFont 加载完成时重新渲染底层
   useEffect(() => {
     renderBackgroundLayer();
-  }, [renderBackgroundLayer]);
-
-  // 当系统/网络楷体字体就绪时，立即重绘确保字模即刻显现
-  useEffect(() => {
-    if (typeof document !== 'undefined' && (document as unknown as { fonts?: { ready: Promise<void> } }).fonts) {
-      (document as unknown as { fonts: { ready: Promise<void> } }).fonts.ready.then(() => {
-        renderBackgroundLayer();
-      });
-    }
-  }, [renderBackgroundLayer]);
+  }, [renderBackgroundLayer, fontVersion]);
 
   // 笔画列表变更时重新渲染顶层
   useEffect(() => {

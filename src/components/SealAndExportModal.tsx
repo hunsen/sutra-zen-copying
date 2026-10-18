@@ -21,6 +21,7 @@ import {
   downloadScrollImage,
   drawSealOnCanvas,
 } from '../engine/ScrollExporter';
+import { useZenFontsReady } from '../engine/fontLoader';
 import {
   X,
   Download,
@@ -58,6 +59,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
 
   // 印章實時預覽 Canvas
   const sealCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fontVersion = useZenFontsReady();
 
   // 繪製印章微縮預覽（古代印章篆體自適應）
   const renderSeal = useCallback((targetCanvas?: HTMLCanvasElement | null) => {
@@ -80,19 +82,16 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
     };
 
     drawSealOnCanvas(ctx, 4, 4, size - 8, cfg);
-  }, [sealText, sealStyle]);
+  }, [sealText, sealStyle, fontVersion]);
 
-  // 當模態框打開或者印章文字/樣式變更時均重新繪製
+  // 當模態框打開、印章文字/樣式變更或字體就緒時均重新繪製
   useEffect(() => {
     if (isOpen) {
-      if (document.fonts) {
-        document.fonts.ready.then(() => renderSeal());
-      }
       renderSeal();
       const raf = requestAnimationFrame(() => renderSeal());
       return () => cancelAnimationFrame(raf);
     }
-  }, [isOpen, renderSeal]);
+  }, [isOpen, renderSeal, fontVersion]);
 
   // 當模態框重新開啟時同步最新的印章與回向文
   useEffect(() => {

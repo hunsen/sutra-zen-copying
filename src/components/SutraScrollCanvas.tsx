@@ -22,6 +22,7 @@ import { renderMultipleStrokes } from '../engine/FingerBrushEngine';
 import { drawPaperBackground } from '../engine/PaperTextureGen';
 import { drawSealOnCanvas } from '../engine/ScrollExporter';
 import { toTraditional } from '../data/builtInSutras';
+import { useZenFontsReady } from '../engine/fontLoader';
 
 const KAI_TI_FONT_STACK =
   '"ZenKai", "Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif';
@@ -72,6 +73,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fontVersion = useZenFontsReady();
 
   // 视口与拖拽滚动状态
   const [viewportWidth, setViewportWidth] = useState(800);
@@ -493,12 +495,13 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     title,
     totalChars,
     writtenChars,
+    fontVersion,
   ]);
 
-  // 当经卷数据、选字或实时笔画变化时更新画布渲染
+  // 当经卷数据、选字、实时笔画或移动端楷体/篆体 WebFont 加载就绪时更新画布渲染
   useEffect(() => {
     renderScroll();
-  }, [renderScroll]);
+  }, [renderScroll, fontVersion]);
 
   // ============================================================================
   // 交互逻辑：平滑拖拽与单指滑动 + 点击字格直接跳转
