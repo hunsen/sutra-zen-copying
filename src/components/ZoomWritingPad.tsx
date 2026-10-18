@@ -323,7 +323,7 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
     if (showGuideChar && currentChar) {
       ctx.save();
       const fontSize = Math.floor(innerSize * 0.88);
-      ctx.font = `normal normal 400 ${fontSize}px "Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif`;
+      ctx.font = `normal normal 400 ${fontSize}px "ZenKai", "Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 

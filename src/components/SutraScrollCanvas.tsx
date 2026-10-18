@@ -23,7 +23,8 @@ import { drawPaperBackground } from '../engine/PaperTextureGen';
 import { drawSealOnCanvas } from '../engine/ScrollExporter';
 import { toTraditional } from '../data/builtInSutras';
 
-const KAI_TI_FONT_STACK = '"Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif';
+const KAI_TI_FONT_STACK =
+  '"ZenKai", "Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif';
 
 export interface SutraScrollCanvasProps {
   /** 经文全部单字数组 */

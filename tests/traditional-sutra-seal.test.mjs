@@ -85,3 +85,33 @@ test('6. 驗證印章字體充滿印面（滿白/滿朱章法）與米字格書�
   assert.ok(pad.includes('innerSize * 0.88'), '米字格書寫底模尺寸比例提升至 88%');
 });
 
+test('7. 驗證全平台開源商用無版權風險字體部署（ZenKai 霞鹜文楷 + AncientSeal 崇羲篆體）', () => {
+  // 1. 驗證 ZenKai 楷體 WebFont 文件部署
+  assert.ok(fs.existsSync('src/assets/fonts/ZenKai.woff2'), 'src/assets/fonts/ZenKai.woff2 存在');
+  assert.ok(fs.existsSync('public/fonts/ZenKai.woff2'), 'public/fonts/ZenKai.woff2 存在');
+  assert.ok(fs.statSync('public/fonts/ZenKai.woff2').size > 1000000, 'ZenKai.woff2 大小正常 (>1MB)');
+
+  // 2. 驗證 CSS 與 Canvas 字體棧優先包含 ZenKai
+  const css = fs.readFileSync('src/index.css', 'utf8');
+  assert.ok(css.includes("font-family: 'ZenKai'"), 'index.css 定義 @font-face ZenKai');
+  assert.ok(css.includes("'ZenKai'"), ':root 優先採用 ZenKai');
+
+  const exporter = fs.readFileSync('src/engine/ScrollExporter.ts', 'utf8');
+  assert.ok(exporter.includes('"ZenKai"'), 'KAI_TI_FONT_STACK 優先採用 ZenKai');
+  assert.ok(!exporter.includes('方正小篆体'), '代碼中已徹底剔除方正小篆體');
+  assert.ok(!exporter.includes('FZXiaoZhuanTi'), '代碼中已徹底剔除方正字體英文名稱');
+
+  const canvas = fs.readFileSync('src/components/SutraScrollCanvas.tsx', 'utf8');
+  assert.ok(canvas.includes('"ZenKai"'), 'SutraScrollCanvas 優先採用 ZenKai');
+
+  const pad = fs.readFileSync('src/components/ZoomWritingPad.tsx', 'utf8');
+  assert.ok(pad.includes('"ZenKai"'), 'ZoomWritingPad 優先採用 ZenKai');
+
+  // 3. 驗證開源授權說明文件
+  assert.ok(fs.existsSync('docs/FONT_LICENSES.md'), 'docs/FONT_LICENSES.md 存在');
+  const licenses = fs.readFileSync('docs/FONT_LICENSES.md', 'utf8');
+  assert.ok(licenses.includes('SIL Open Font License 1.1'), '明確標註 SIL OFL 1.1 協議');
+  assert.ok(licenses.includes('CC-BY-ND-3.0-TW'), '明確標註崇羲篆體官方開源商用授權');
+});
+
+

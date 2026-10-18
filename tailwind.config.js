@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         serif: [
+          'ZenKai',
           'Kaiti TC',
           'BiauKai',
           'DFKai-SB',
@@ -26,11 +27,10 @@ export default {
         ],
         seal: [
           'AncientSeal',
-          'FZXiaoZhuan',
-          '方正小篆体',
+          'Chong Xi Small Seal',
+          '崇羲篆體',
+          '崇羲篆体',
           'SealScript',
-          'Kaiti TC',
-          'BiauKai',
           'serif',
         ],
       },

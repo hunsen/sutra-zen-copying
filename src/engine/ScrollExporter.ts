@@ -41,8 +41,10 @@ const BASE_MARGIN_BOTTOM = 50;
 
 import { toTraditional } from '../data/builtInSutras';
 
-const KAI_TI_FONT_STACK = '"Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif';
-const ANCIENT_SEAL_FONT_STACK = '"AncientSeal", "FZXiaoZhuanTi-S13T", "方正小篆体", "SealScript", "Kaiti TC", "BiauKai", serif';
+export const KAI_TI_FONT_STACK =
+  '"ZenKai", "Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif';
+export const ANCIENT_SEAL_FONT_STACK =
+  '"AncientSeal", "Chong Xi Small Seal", "崇羲篆體", "崇羲篆体", "SealScript", serif';
 
 /**
  * 繪製傳統朱文（陽刻白底紅字）或白文（陰刻紅底白字）古代篆刻印章
