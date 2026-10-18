@@ -43,7 +43,16 @@ export interface WrittenCharRecord {
 /**
  * 经文分类
  */
-export type SutraCategory = '佛经' | '道藏' | '儒家经典' | '古诗词' | '自定义';
+export type SutraCategory =
+  | '佛经'
+  | '道藏'
+  | '儒家经典'
+  | '古诗词'
+  | '自定义'
+  | '佛經'
+  | '儒家經典'
+  | '古詩詞'
+  | '自定義';
 
 /**
  * 经文元数据与纯净字流
@@ -189,8 +198,8 @@ export interface SealConfig {
   text: string;
   /** 印章风格：朱文（阳刻白底红字） | 白文（阴刻红底白字） */
   style: 'zhu' | 'bai';
-  /** 印章形状：方印 | 圆印 */
-  shape: 'square' | 'round';
+  /** 印章形状：方印 | 圆印 | 随形/椭圆印 */
+  shape: 'square' | 'round' | 'circle' | 'oval';
   /** 边框斑驳残损度 (0 ~ 1) */
   roughness: number;
 }

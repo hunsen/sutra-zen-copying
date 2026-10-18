@@ -5,18 +5,33 @@ export default {
     extend: {
       fontFamily: {
         serif: [
+          'Kaiti TC',
+          'BiauKai',
+          'DFKai-SB',
+          'TW-MOE-Std-Kai',
           'Kaiti SC',
           'STKaiti',
           'KaiTi',
+          'Noto Serif TC',
           'Noto Serif SC',
           'SimSun',
           'serif',
         ],
         sans: [
+          'PingFang TC',
           'PingFang SC',
           'Hiragino Sans GB',
           'Microsoft YaHei',
           'sans-serif',
+        ],
+        seal: [
+          'AncientSeal',
+          'FZXiaoZhuan',
+          '方正小篆体',
+          'SealScript',
+          'Kaiti TC',
+          'BiauKai',
+          'serif',
         ],
       },
       opacity: {

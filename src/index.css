@@ -2,8 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'AncientSeal';
+  src: url('./assets/fonts/AncientSeal.woff2') format('woff2'),
+       url('/fonts/AncientSeal.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  font-family: 'Kaiti SC', 'STKaiti', 'KaiTi', 'Noto Serif SC', SimSun, serif;
+  font-family: 'Kaiti TC', 'BiauKai', 'DFKai-SB', 'TW-MOE-Std-Kai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Noto Serif TC', 'Noto Serif SC', SimSun, serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;

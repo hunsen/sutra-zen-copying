@@ -39,8 +39,21 @@ const BASE_MARGIN_LEFT = 80;
 const BASE_MARGIN_TOP = 50;
 const BASE_MARGIN_BOTTOM = 50;
 
+import { toTraditional } from '../data/builtInSutras';
+
+const KAI_TI_FONT_STACK = '"Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif';
+const ANCIENT_SEAL_FONT_STACK = '"AncientSeal", "FZXiaoZhuanTi-S13T", "方正小篆体", "SealScript", "Kaiti TC", "BiauKai", serif';
+
 /**
- * 绘制传统朱文（阳刻白底红字）或白文（阴刻红底白字）篆刻方印
+ * 繪製傳統朱文（陽刻白底紅字）或白文（陰刻紅底白字）古代篆刻印章
+ * 1. 采用古代真實印章字體（小篆 / 篆書）
+ * 2. 印文自動轉為標準繁體正字
+ * 3. 嚴格遵循古典篆刻章法自適應佈局：
+ *    - 1 字印：單字居中沈穩大氣（如「靜」、「心」、「佛」）
+ *    - 2 字印：上下貫通直排一列（如「靜心」、「吉祥」）
+ *    - 3 字印：古典「右二左一」經典章法（右列兩字、左列一字居中微大相映成趣）
+ *    - 4 字印：漢印標準田字格（右上[0]、右下[1]、左上[2]、左下[3]）
+ *    - 5~6 字印：多列自適應均布
  */
 export function drawSealOnCanvas(
   ctx: CanvasRenderingContext2D,
@@ -51,51 +64,121 @@ export function drawSealOnCanvas(
 ): void {
   ctx.save();
 
-  const isBaiWen = config.style === 'bai'; // 白文：红底白字；朱文：白/纸底红字
+  const isBaiWen = config.style === 'bai'; // 白文：紅底白字；朱文：白底紅字
+  const sealShape = config.shape || 'square';
   const sealRed = '#A61C1C';
   const sealDarkRed = '#7D1010';
+  const sealPaper = '#FFF8F0';
+
+  // 1. 將文字轉換為純正繁體字
+  const rawText = (config.text || '靜心').trim();
+  const tradText = toTraditional(rawText) || '靜心';
+  const chars = tradText.slice(0, 6).split('');
+  const numChars = chars.length;
+
+  // 2. 繪製印章外框與印泥底色（支持方印、圓印、橢圓印）
+  ctx.beginPath();
+  if (sealShape === 'round' || sealShape === 'circle') {
+    const cx = x + size / 2;
+    const cy = y + size / 2;
+    const r = size / 2 - 1.5;
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  } else if (sealShape === 'oval') {
+    const cx = x + size / 2;
+    const cy = y + size / 2;
+    ctx.ellipse(cx, cy, size / 2 - 2, size * 0.44, 0, 0, Math.PI * 2);
+  } else {
+    // 經典方印，微圓角金石磨損質感
+    const radius = Math.max(1, size * 0.04);
+    if (typeof (ctx as any).roundRect === 'function') {
+      (ctx as any).roundRect(x, y, size, size, radius);
+    } else {
+      ctx.rect(x, y, size, size);
+    }
+  }
 
   if (isBaiWen) {
-    // 白文：朱砂红底
+    // 白文：朱砂紅實心底
     ctx.fillStyle = sealRed;
-    ctx.fillRect(x, y, size, size);
+    ctx.fill();
 
-    // 斑驳残边 (模拟金石刀刻残损感)
+    // 外邊緣金石暗紅修飾線（微滲印泥效果）
     ctx.strokeStyle = sealDarkRed;
-    ctx.lineWidth = 2.0;
-    ctx.strokeRect(x, y, size, size);
+    ctx.lineWidth = Math.max(1.5, size * 0.035);
+    ctx.stroke();
 
-    ctx.fillStyle = '#FFF8F0'; // 宣纸色字体
+    ctx.fillStyle = sealPaper; // 刻去部分露出宣紙白
   } else {
-    // 朱文：纸底红框红字
+    // 朱文：紙底紅框紅字
     ctx.strokeStyle = sealRed;
-    ctx.lineWidth = 3.0;
-    ctx.strokeRect(x + 1.5, y + 1.5, size - 3, size - 3);
+    ctx.lineWidth = Math.max(2.5, size * 0.06);
+    ctx.stroke();
 
     ctx.fillStyle = sealRed;
   }
 
-  // 印章文字排版（支持 2~4 字）
-  const textChars = config.text.trim().slice(0, 4).split('');
+  // 3. 字體設置：古代印章篆書優先
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  if (textChars.length === 2) {
-    ctx.font = `normal bold ${Math.floor(size * 0.42)}px "Kaiti SC", "STKaiti", "KaiTi", serif`;
-    ctx.fillText(textChars[0], x + size / 2, y + size * 0.3);
-    ctx.fillText(textChars[1], x + size / 2, y + size * 0.72);
-  } else if (textChars.length >= 3) {
-    // 四字田字格传统回文或自右向左排列
-    ctx.font = `normal bold ${Math.floor(size * 0.36)}px "Kaiti SC", "STKaiti", "KaiTi", serif`;
+  // 4. 根據字數自適應章法排版
+  if (numChars === 1) {
+    // 【一字印】：單字居中，雄渾端肅
+    const fontSize = Math.floor(size * 0.60);
+    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
+    ctx.fillText(chars[0], x + size / 2, y + size * 0.51);
+  } else if (numChars === 2) {
+    // 【二字印】：縱列一列，從上到下貫通
+    const fontSize = Math.floor(size * 0.38);
+    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
+    ctx.fillText(chars[0], x + size / 2, y + size * 0.32);
+    ctx.fillText(chars[1], x + size / 2, y + size * 0.70);
+  } else if (numChars === 3) {
+    // 【三字印】：經典古法篆刻「右二左一」章法
+    // 右列為前二字，左列為第三字（居中略寬以平衡氣韻）
+    const fontSizeRight = Math.floor(size * 0.34);
+    const fontSizeLeft = Math.floor(size * 0.40);
+
+    // 右列兩字
+    ctx.font = `normal normal ${fontSizeRight}px ${ANCIENT_SEAL_FONT_STACK}`;
+    ctx.fillText(chars[0], x + size * 0.72, y + size * 0.32);
+    ctx.fillText(chars[1], x + size * 0.72, y + size * 0.70);
+
+    // 左列一字居中
+    ctx.font = `normal normal ${fontSizeLeft}px ${ANCIENT_SEAL_FONT_STACK}`;
+    ctx.fillText(chars[2], x + size * 0.28, y + size * 0.51);
+  } else if (numChars === 4) {
+    // 【四字印】：經典漢印田字格（從右至左，從上至下）
+    const fontSize = Math.floor(size * 0.34);
+    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
     const colRight = x + size * 0.72;
     const colLeft = x + size * 0.28;
-    const rowTop = y + size * 0.3;
-    const rowBottom = y + size * 0.72;
+    const rowTop = y + size * 0.32;
+    const rowBottom = y + size * 0.70;
 
-    ctx.fillText(textChars[0], colRight, rowTop);
-    ctx.fillText(textChars[1], colRight, rowBottom);
-    ctx.fillText(textChars[2], colLeft, rowTop);
-    ctx.fillText(textChars[3] || '印', colLeft, rowBottom);
+    ctx.fillText(chars[0], colRight, rowTop);
+    ctx.fillText(chars[1], colRight, rowBottom);
+    ctx.fillText(chars[2], colLeft, rowTop);
+    ctx.fillText(chars[3], colLeft, rowBottom);
+  } else {
+    // 【多字印 (5~6字)】：雙列多行自適應
+    const fontSize = Math.floor(size * 0.26);
+    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
+    const half = Math.ceil(numChars / 2);
+    const rightCol = chars.slice(0, half);
+    const leftCol = chars.slice(half);
+
+    const stepRight = (size * 0.75) / Math.max(1, rightCol.length);
+    const startYRight = y + size * 0.18 + stepRight / 2;
+    rightCol.forEach((c, i) => {
+      ctx.fillText(c, x + size * 0.72, startYRight + i * stepRight);
+    });
+
+    const stepLeft = (size * 0.75) / Math.max(1, leftCol.length);
+    const startYLeft = y + size * 0.18 + stepLeft / 2;
+    leftCol.forEach((c, i) => {
+      ctx.fillText(c, x + size * 0.28, startYLeft + i * stepLeft);
+    });
   }
 
   ctx.restore();
@@ -112,8 +195,8 @@ export function renderFullScrollToCanvas(
     writtenChars,
     paperTheme = 'xuan',
     inkType = 'black',
-    dedicationText = '愿以此功德，普及于一切，我等与众生，皆共成佛道。',
-    sealConfig = { text: '静心', style: 'bai', shape: 'square', roughness: 0.2 },
+    dedicationText = '願以此功德，普及於一切，我等與眾生，皆共成佛道。',
+    sealConfig = { text: '靜心', style: 'bai', shape: 'square', roughness: 0.2 },
     charsPerColumn = 8,
     scale = 2.0,
   } = options;
@@ -183,10 +266,10 @@ export function renderFullScrollToCanvas(
   ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = 'normal bold 24px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+  ctx.font = `normal bold 24px ${KAI_TI_FONT_STACK}`;
 
   // 经题在右列，译者在左列（符合传统右起阅读顺序）
-  const titleChars = sutra.title.split('');
+  const titleChars = toTraditional(sutra.title).split('');
   const titleStep = Math.min(34, (headerH - 100) / (titleChars.length || 1));
   const titleStartX = headerX + BASE_HEADER_WIDTH / 2 + 14;
   const titleStartY = headerY + 48;
@@ -195,9 +278,9 @@ export function renderFullScrollToCanvas(
   });
 
   // 译者题注（居左）
-  ctx.font = 'normal normal 14px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+  ctx.font = `normal normal 14px ${KAI_TI_FONT_STACK}`;
   ctx.globalAlpha = 0.8;
-  const authorChars = sutra.authorOrTranslator.split('');
+  const authorChars = toTraditional(sutra.authorOrTranslator).split('');
   const authorStartX = headerX + BASE_HEADER_WIDTH / 2 - 18;
   const authorStartY = headerY + 70;
   authorChars.forEach((c, idx) => {
@@ -250,15 +333,16 @@ export function renderFullScrollToCanvas(
         renderMultipleStrokes(ctx, record.strokes, innerSize, innerSize, inkHex);
         ctx.restore();
       } else {
-        // 未完成字：微弱楷体留白底印
+        // 未完成字：微弱楷体留白底印（正体繁体）
         ctx.save();
         ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
         ctx.globalAlpha = 0.16;
-        ctx.font = 'normal normal 40px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+        ctx.font = `normal normal 40px ${KAI_TI_FONT_STACK}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        const displayChar = toTraditional(sutra.content[charIdx] || '');
         ctx.fillText(
-          sutra.content[charIdx],
+          displayChar,
           cellX + BASE_CELL_SIZE / 2,
           cellY + BASE_CELL_SIZE / 2 + 2
         );
@@ -274,11 +358,12 @@ export function renderFullScrollToCanvas(
 
   ctx.save();
   ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
-  ctx.font = 'normal normal 14px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+  ctx.font = `normal normal 14px ${KAI_TI_FONT_STACK}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  const dChars = dedicationText.split('');
+  const tradDedication = toTraditional(dedicationText);
+  const dChars = tradDedication.split('');
   const halfD = Math.ceil(dChars.length / 2);
   const col1 = dChars.slice(0, halfD);
   const col2 = dChars.slice(halfD);
@@ -309,7 +394,7 @@ export function downloadScrollImage(
   fileName?: string
 ): void {
   const canvas = renderFullScrollToCanvas(options);
-  const defaultName = `${options.sutra.title}_装裱长卷_${new Date().toISOString().slice(0, 10)}.png`;
+  const defaultName = `${options.sutra.title}_裝裱長卷_${new Date().toISOString().slice(0, 10)}.png`;
 
   if (typeof canvas.toBlob === 'function') {
     canvas.toBlob((blob) => {

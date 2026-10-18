@@ -13,7 +13,10 @@ import {
   InkType,
   SealConfig,
 } from '../types/sutra';
-import { DEDICATION_TEMPLATES } from '../data/builtInSutras';
+import {
+  DEDICATION_TEMPLATES,
+  toTraditional,
+} from '../data/builtInSutras';
 import {
   downloadScrollImage,
   drawSealOnCanvas,
@@ -43,20 +46,20 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
   writtenChars,
   paperTheme,
   inkType,
-  initialDedicationText = '愿以此功德，普及于一切，我等与众生，皆共成佛道。',
-  initialSealText = '静心',
+  initialDedicationText = '願以此功德，普及於一切，我等與眾生，皆共成佛道。',
+  initialSealText = '靜心',
   onSaveSealAndDedication,
 }) => {
-  // 钤印与回向文设置
-  const [sealText, setSealText] = useState(initialSealText);
+  // 鈐印與回向文設置
+  const [sealText, setSealText] = useState(toTraditional(initialSealText) || '靜心');
   const [sealStyle, setSealStyle] = useState<'bai' | 'zhu'>('bai');
-  const [dedicationText, setDedicationText] = useState(initialDedicationText);
+  const [dedicationText, setDedicationText] = useState(toTraditional(initialDedicationText));
   const [isExporting, setIsExporting] = useState(false);
 
-  // 印章实时预览 Canvas
+  // 印章實時預覽 Canvas
   const sealCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // 绘制印章微缩预览
+  // 繪製印章微縮預覽（古代印章篆體自適應）
   const renderSeal = useCallback((targetCanvas?: HTMLCanvasElement | null) => {
     const canvas = targetCanvas || sealCanvasRef.current;
     if (!canvas) return;
@@ -70,7 +73,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
     ctx.clearRect(0, 0, size, size);
 
     const cfg: SealConfig = {
-      text: sealText || '静心',
+      text: toTraditional(sealText) || '靜心',
       style: sealStyle,
       shape: 'square',
       roughness: 0.2,
@@ -79,34 +82,40 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
     drawSealOnCanvas(ctx, 4, 4, size - 8, cfg);
   }, [sealText, sealStyle]);
 
-  // 当模态框打开或者印章文字/样式变更时均重新绘制
+  // 當模態框打開或者印章文字/樣式變更時均重新繪製
   useEffect(() => {
     if (isOpen) {
+      if (document.fonts) {
+        document.fonts.ready.then(() => renderSeal());
+      }
       renderSeal();
       const raf = requestAnimationFrame(() => renderSeal());
       return () => cancelAnimationFrame(raf);
     }
   }, [isOpen, renderSeal]);
 
-  // 当模态框重新开启时同步最新的印章与回向文
+  // 當模態框重新開啟時同步最新的印章與回向文
   useEffect(() => {
     if (isOpen) {
-      setSealText(initialSealText);
-      setDedicationText(initialDedicationText);
+      setSealText(toTraditional(initialSealText) || '靜心');
+      setDedicationText(toTraditional(initialDedicationText));
     }
   }, [isOpen, initialSealText, initialDedicationText]);
 
   /**
-   * 执行高清装裱长卷 PNG 下载
+   * 執行高清裝裱長卷 PNG 下載
    */
   const handleDownload = () => {
     setIsExporting(true);
 
+    const finalDedication = toTraditional(dedicationText);
+    const finalSeal = toTraditional(sealText) || '靜心';
+
     if (onSaveSealAndDedication) {
-      onSaveSealAndDedication(dedicationText, sealText);
+      onSaveSealAndDedication(finalDedication, finalSeal);
     }
 
-    // 延时让 UI 给予点击反馈
+    // 延時讓 UI 給予點擊反饋
     window.setTimeout(() => {
       try {
         downloadScrollImage({
@@ -114,17 +123,17 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
           writtenChars,
           paperTheme,
           inkType,
-          dedicationText,
+          dedicationText: finalDedication,
           sealConfig: {
-            text: sealText || '静心',
+            text: finalSeal,
             style: sealStyle,
             shape: 'square',
             roughness: 0.2,
           },
-          scale: 2.0, // 2x 超清印刷级长卷
+          scale: 2.0, // 2x 超清印刷級長卷
         });
       } catch (err) {
-        console.error('导出长图失败:', err);
+        console.error('導出長圖失敗:', err);
       } finally {
         setIsExporting(false);
       }
@@ -158,7 +167,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
             {/* 印章配置 */}
             <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center bg-stone-800/40 p-4 rounded-2xl border border-stone-700/40">
               <div className="flex flex-col items-center">
-                <span className="text-xs text-stone-400 mb-2">印章实景预览</span>
+                <span className="text-xs text-stone-400 mb-2">印章實景預覽</span>
                 <canvas
                   ref={(node) => {
                     sealCanvasRef.current = node;
@@ -173,14 +182,14 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
               <div className="flex-1 flex flex-col gap-3">
                 <div>
                   <label className="text-xs text-stone-400 block mb-1">
-                    篆刻印文（2~4字，如姓名、静心、欢喜）
+                    篆刻印文（1~4字，小篆自適應佈局）
                   </label>
                   <input
                     type="text"
                     maxLength={4}
                     value={sealText}
-                    onChange={(e) => setSealText(e.target.value.trim().slice(0, 4))}
-                    placeholder="输入印文，例如：静心"
+                    onChange={(e) => setSealText(toTraditional(e.target.value).slice(0, 4))}
+                    placeholder="輸入印文，例如：靜、靜心、清淨心、吉祥如意"
                     className="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-1.5 text-sm text-stone-100 focus:outline-none focus:border-amber-600 transition-colors"
                   />
                 </div>
@@ -199,7 +208,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
                           : 'bg-stone-800/60 border-stone-700 text-stone-400 hover:text-stone-200'
                       }`}
                     >
-                      白文（阴刻·红底白字）
+                      白文（陰刻·紅底白字）
                     </button>
                     <button
                       type="button"
@@ -210,7 +219,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
                           : 'bg-stone-800/60 border-stone-700 text-stone-400 hover:text-stone-200'
                       }`}
                     >
-                      朱文（阳刻·白底红字）
+                      朱文（陽刻·白底紅字）
                     </button>
                   </div>
                 </div>
@@ -221,10 +230,10 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-amber-200">
-                  卷尾发愿回向文
+                  卷尾發願回向文
                 </span>
                 <span className="text-[11px] text-stone-400">
-                  可直接选用经典回向偈，或自定善愿
+                  可直接選用經典回向偈，或自定善願
                 </span>
               </div>
 
@@ -250,7 +259,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
                 rows={2}
                 value={dedicationText}
                 onChange={(e) => setDedicationText(e.target.value)}
-                placeholder="愿以此抄经功德，回向一切众生，平安喜乐..."
+                placeholder="願以此抄經功德，回向一切眾生，平安喜樂..."
                 className="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-xs text-stone-200 leading-relaxed focus:outline-none focus:border-amber-600 transition-colors resize-none"
               />
             </div>
@@ -258,7 +267,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
             {/* 导出说明与按钮 */}
             <div className="mt-2 pt-4 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-xs text-stone-400">
-                <span>长卷尺寸：超清装裱画幅（2x 缩放，内含乌丝栏与全部矢量笔迹）</span>
+                <span>長卷尺寸：超清裝裱畫幅（2x 縮放，內含烏絲欄與全部矢量筆跡）</span>
               </div>
 
               <button
@@ -268,7 +277,7 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
                 className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 font-medium text-sm tracking-wider shadow-lg active:scale-95 transition-all disabled:opacity-50"
               >
                 <Download size={16} />
-                <span>{isExporting ? '长卷装裱合成中...' : '下载装裱长卷 PNG'}</span>
+                <span>{isExporting ? '長卷裝裱合成中...' : '下載裝裱長卷 PNG'}</span>
               </button>
             </div>
           </div>

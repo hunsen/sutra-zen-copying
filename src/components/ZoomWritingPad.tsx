@@ -34,6 +34,7 @@ import {
   getExpectedStrokeCount,
   isCharacterComplete,
 } from '../data/chineseStrokeData';
+import { toTraditional } from '../data/builtInSutras';
 import {
   RotateCcw,
   Trash2,
@@ -318,11 +319,11 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
     );
     ctx.restore();
 
-    // 3. 绘制楷体小楷字模（名家底帖）
+    // 3. 绘制楷体小楷字模（正体名家底帖）
     if (showGuideChar && currentChar) {
       ctx.save();
       const fontSize = Math.floor(innerSize * 0.72);
-      ctx.font = `normal normal 400 ${fontSize}px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", "SimSun", serif`;
+      ctx.font = `normal normal 400 ${fontSize}px "Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -330,7 +331,8 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
       ctx.fillStyle = themeConfig.recommendedInkColor || '#1C1B19';
       ctx.globalAlpha = Math.min(0.85, Math.max(0.08, guideOpacity));
       // 垂直居中微调（中文字符光学偏置 +4px）
-      ctx.fillText(currentChar, cx, cy + 4);
+      const displayChar = toTraditional(currentChar);
+      ctx.fillText(displayChar, cx, cy + 4);
       ctx.restore();
     }
 

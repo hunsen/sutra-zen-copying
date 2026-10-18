@@ -21,6 +21,9 @@ import {
 import { renderMultipleStrokes } from '../engine/FingerBrushEngine';
 import { drawPaperBackground } from '../engine/PaperTextureGen';
 import { drawSealOnCanvas } from '../engine/ScrollExporter';
+import { toTraditional } from '../data/builtInSutras';
+
+const KAI_TI_FONT_STACK = '"Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif';
 
 export interface SutraScrollCanvasProps {
   /** 经文全部单字数组 */
@@ -272,11 +275,11 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const titleChars = title.split('');
+    const titleChars = toTraditional(title).split('');
 
     if (isCompactMode) {
       // 紧凑横卷模式：经名双列优雅排版
-      ctx.font = 'normal bold 16px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.font = `normal bold 16px ${KAI_TI_FONT_STACK}`;
       const halfTitle = Math.ceil(titleChars.length / 2);
       const titleCol1 = titleChars.slice(0, halfTitle);
       const titleCol2 = titleChars.slice(halfTitle);
@@ -294,7 +297,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       });
     } else {
       // 经典多行模式：单列经名 + 译者题跋
-      ctx.font = 'normal bold 22px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.font = `normal bold 22px ${KAI_TI_FONT_STACK}`;
       const titleCenterX = headerX + HEADER_WIDTH / 2 + 12;
       const titleCharStep = Math.min(32, (headerH - 90) / (titleChars.length || 1));
       const titleStartY = headerY + 45;
@@ -304,10 +307,10 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       });
 
       // 绘制译者/题跋（稍小号竖排，居左）
-      ctx.font = 'normal normal 13px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.font = `normal normal 13px ${KAI_TI_FONT_STACK}`;
       ctx.globalAlpha = 0.75;
       const authorCenterX = headerX + HEADER_WIDTH / 2 - 16;
-      const authorChars = authorOrTranslator.split('');
+      const authorChars = toTraditional(authorOrTranslator).split('');
       const authorCharStep = 18;
       const authorStartY = headerY + 65;
       authorChars.forEach((ch, idx) => {
@@ -363,10 +366,10 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
           renderMultipleStrokes(ctx, strokesToDraw, innerSize, innerSize, inkHex);
           ctx.restore();
         } else {
-          // 未抄写字格：半透明小楷名家底稿字模（字号占比提升至 66%，大幅提高清晰度）
+          // 未抄写字格：半透明小楷名家底稿字模（正体繁体）
           ctx.save();
           const charFontSize = Math.floor(CELL_SIZE * 0.66);
-          ctx.font = `normal normal ${charFontSize}px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif`;
+          ctx.font = `normal normal ${charFontSize}px ${KAI_TI_FONT_STACK}`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           if (isCurrent) {
@@ -377,7 +380,7 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
             ctx.globalAlpha = 0.35; // 底帖字模清晰可见，久看不累
           }
           ctx.fillText(
-            ch,
+            toTraditional(ch),
             cellX + CELL_SIZE / 2,
             cellY + CELL_SIZE / 2 + 2
           );
@@ -396,12 +399,12 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const cleanDedication = dedicationText.replace(/[，。]/g, '');
+    const cleanDedication = toTraditional(dedicationText).replace(/[，。]/g, '');
     const dedicationChars = cleanDedication.split('');
 
     if (isCompactMode) {
       // 紧凑横卷模式：回向文多列紧凑小楷 + 闲章
-      ctx.font = 'normal normal 12px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.font = `normal normal 12px ${KAI_TI_FONT_STACK}`;
       ctx.globalAlpha = 0.85;
 
       const charsPerCol = effectiveCharsPerColumn === 2 ? 4 : 5;
@@ -422,17 +425,17 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       const sealX = tailStartX + 8;
       const sealY = tailY + (tailH - sealSize) / 2;
       drawSealOnCanvas(ctx, sealX, sealY, sealSize, {
-        text: sealText || '静心',
+        text: toTraditional(sealText || '靜心'),
         style: 'bai',
         shape: 'square',
         roughness: 0.2,
       });
     } else {
       // 经典多行模式：回向文两列排版 + 方印
-      ctx.font = 'normal normal 13px "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif';
+      ctx.font = `normal normal 13px ${KAI_TI_FONT_STACK}`;
       ctx.globalAlpha = 0.85;
 
-      const rawDedicationChars = dedicationText.split('');
+      const rawDedicationChars = toTraditional(dedicationText).split('');
       const half = Math.ceil(rawDedicationChars.length / 2);
       const col1Chars = rawDedicationChars.slice(0, half);
       const col2Chars = rawDedicationChars.slice(half);
@@ -452,9 +455,8 @@ export const SutraScrollCanvas: React.FC<SutraScrollCanvasProps> = ({
       const sealSize = 42;
       const sealX = tailStartX + 20;
       const sealY = tailY + tailH - sealSize - 20;
-
       drawSealOnCanvas(ctx, sealX, sealY, sealSize, {
-        text: sealText || '静心',
+        text: toTraditional(sealText || '靜心'),
         style: 'bai',
         shape: 'square',
         roughness: 0.2,
