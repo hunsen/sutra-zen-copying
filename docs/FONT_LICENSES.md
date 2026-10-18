@@ -4,17 +4,17 @@
 
 ---
 
-## 1. 经文与米字格正体小楷字体：霞鹜文楷 (ZenKai / LXGW WenKai TC)
+## 1. 经文与米字格正体楷体字体：全字库正楷体 (ZenKai / TW-Kai)
 
-- **字体名称**：霞鹜文楷 TC (LXGW WenKai TC Medium)
+- **字体名称**：全字库正楷体 (TW-Kai)
 - **字体别名**：ZenKai
-- **字形作者**：落霞孤鹜 (LXGW)、Fontworks (Klee Project Authors)
-- **项目开源主页**：https://github.com/lxgw/LxgwWenkaiTC
-- **开源授权协议**：**SIL Open Font License 1.1 (SIL OFL-1.1)**
+- **研制机构**：台湾国家发展委员会（CNS11643 中文标准交换码全字库）
+- **官方主页与授权**：https://data.gov.tw/dataset/5961 / https://www.cns11643.gov.tw
+- **授权协议**：**政府资料开放授权条款 - 第1版 (Open Government Data License, version 1.0)**
 - **许可说明**：
-  - 本字体遵循 SIL OFL 1.1 协议，任何人可**完全免费用于个人与商业用途**。
-  - 允许自由打包、分发、内嵌至网页（WebFont）、移动应用（App）以及印刷出版物中。
-  - 彻底解决 iOS（iPhone/iPad）与 Android 原厂系统缺乏楷体字库导致的字体降级问题。
+  - 依政府资料开放授权条款，任何人享有永久、全球、无偿、非专属性之权利，为任何合法目的（**包括商业性利用**）进行重制、散布、传输、改作与内嵌。
+  - 结构方正严谨、唐楷骨架端庄，涵盖逾 39,000+ 字国家标准正体字库，内置心经、金刚经、大悲咒、药师经等全部经文**0 缺字**。
+  - 完整内嵌 WOFF2 格式，彻底解决 iOS（iPhone/iPad）与 Android 原厂系统无楷体导致的降级问题，杜绝任何商用侵权风险。
 
 ---
 
