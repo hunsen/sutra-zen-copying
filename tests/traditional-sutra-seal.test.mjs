@@ -73,3 +73,15 @@ test('5. 驗證 AncientSeal.woff2 字體文件已正確部署至 src/assets/font
   assert.ok(fs.existsSync('public/fonts/AncientSeal.woff2'), 'public/fonts/AncientSeal.woff2 存在');
   assert.ok(fs.statSync('public/fonts/AncientSeal.woff2').size > 1000000, '字體大小正常 (~2MB)');
 });
+
+test('6. 驗證印章字體充滿印面（滿白/滿朱章法）與米字格書寫字模加大至 88%', () => {
+  const exporter = fs.readFileSync('src/engine/ScrollExporter.ts', 'utf8');
+  assert.ok(exporter.includes('drawSealChar'), '定義印章字符居中縮放繪製輔助函數');
+  assert.ok(exporter.includes('雙列並峙'), '二字印採用雙列並峙章法完全充實左右兩廂');
+  assert.ok(exporter.includes('右二左一'), '三字印採用右二左一飽滿佈局');
+  assert.ok(exporter.includes('田字格'), '四字印採用經典田字格茂密滿白佈局');
+
+  const pad = fs.readFileSync('src/components/ZoomWritingPad.tsx', 'utf8');
+  assert.ok(pad.includes('innerSize * 0.88'), '米字格書寫底模尺寸比例提升至 88%');
+});
+

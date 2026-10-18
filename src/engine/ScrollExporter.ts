@@ -117,67 +117,94 @@ export function drawSealOnCanvas(
     ctx.fillStyle = sealRed;
   }
 
-  // 3. 字體設置：古代印章篆書優先
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  // 3. 篆刻印文繪製輔助函數（支持中心縮放與字勢拓展，充盈印面，計白當黑）
+  const drawSealChar = (
+    char: string,
+    cx: number,
+    cy: number,
+    fontSize: number,
+    scaleX = 1.0,
+    scaleY = 1.0
+  ) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    if (scaleX !== 1.0 || scaleY !== 1.0) {
+      ctx.scale(scaleX, scaleY);
+    }
+    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(char, 0, 0);
+    ctx.restore();
+  };
 
-  // 4. 根據字數自適應章法排版
+  // 4. 根據字數自適應章法排版（遵古法「印貴填密」、「計白當黑」漢印滿白/滿朱章法）
+  const isRound = sealShape === 'round' || sealShape === 'circle' || sealShape === 'oval';
+
   if (numChars === 1) {
-    // 【一字印】：單字居中，雄渾端肅
-    const fontSize = Math.floor(size * 0.60);
-    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
-    ctx.fillText(chars[0], x + size / 2, y + size * 0.51);
+    // 【一字印】：單字居中，雄渾端肅，橫向展闊充盈印面
+    const fontSize = Math.floor(size * (isRound ? 0.76 : 0.82));
+    const sx = isRound ? 1.10 : 1.18;
+    drawSealChar(chars[0], x + size / 2, y + size * 0.50, fontSize, sx, 1.0);
   } else if (numChars === 2) {
-    // 【二字印】：縱列一列，從上到下貫通
-    const fontSize = Math.floor(size * 0.38);
-    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
-    ctx.fillText(chars[0], x + size / 2, y + size * 0.32);
-    ctx.fillText(chars[1], x + size / 2, y + size * 0.70);
+    // 【二字印】：方印經典漢制「雙列並峙」（右列首字，左列次字），直貫上下，完全充實左右兩廂
+    const fontSize = Math.floor(size * (isRound ? 0.68 : 0.74));
+    const colRight = x + size * (isRound ? 0.68 : 0.73);
+    const colLeft = x + size * (isRound ? 0.32 : 0.27);
+    const sx = isRound ? 1.04 : 1.10;
+
+    drawSealChar(chars[0], colRight, y + size * 0.50, fontSize, sx, 1.0);
+    drawSealChar(chars[1], colLeft, y + size * 0.50, fontSize, sx, 1.0);
   } else if (numChars === 3) {
     // 【三字印】：經典古法篆刻「右二左一」章法
-    // 右列為前二字，左列為第三字（居中略寬以平衡氣韻）
-    const fontSizeRight = Math.floor(size * 0.34);
-    const fontSizeLeft = Math.floor(size * 0.40);
+    // 右列為前二字疊布，左列為第三字頂天立地，全幅飽滿
+    const fontSizeRight = Math.floor(size * (isRound ? 0.38 : 0.44));
+    const fontSizeLeft = Math.floor(size * (isRound ? 0.68 : 0.74));
+    const colRight = x + size * (isRound ? 0.68 : 0.73);
+    const colLeft = x + size * (isRound ? 0.32 : 0.27);
+    const rowTop = y + size * (isRound ? 0.32 : 0.29);
+    const rowBottom = y + size * (isRound ? 0.68 : 0.71);
+    const sx = isRound ? 1.04 : 1.12;
 
     // 右列兩字
-    ctx.font = `normal normal ${fontSizeRight}px ${ANCIENT_SEAL_FONT_STACK}`;
-    ctx.fillText(chars[0], x + size * 0.72, y + size * 0.32);
-    ctx.fillText(chars[1], x + size * 0.72, y + size * 0.70);
+    drawSealChar(chars[0], colRight, rowTop, fontSizeRight, sx, 1.0);
+    drawSealChar(chars[1], colRight, rowBottom, fontSizeRight, sx, 1.0);
 
-    // 左列一字居中
-    ctx.font = `normal normal ${fontSizeLeft}px ${ANCIENT_SEAL_FONT_STACK}`;
-    ctx.fillText(chars[2], x + size * 0.28, y + size * 0.51);
+    // 左列一字居中貫通
+    drawSealChar(chars[2], colLeft, y + size * 0.50, fontSizeLeft, sx, 1.0);
   } else if (numChars === 4) {
-    // 【四字印】：經典漢印田字格（從右至左，從上至下）
-    const fontSize = Math.floor(size * 0.34);
-    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
-    const colRight = x + size * 0.72;
-    const colLeft = x + size * 0.28;
-    const rowTop = y + size * 0.32;
-    const rowBottom = y + size * 0.70;
+    // 【四字印】：經典漢印田字格（右上->右下->左上->左下），字勢茂密，滿白/滿朱
+    const fontSize = Math.floor(size * (isRound ? 0.38 : 0.44));
+    const colRight = x + size * (isRound ? 0.68 : 0.73);
+    const colLeft = x + size * (isRound ? 0.32 : 0.27);
+    const rowTop = y + size * (isRound ? 0.32 : 0.29);
+    const rowBottom = y + size * (isRound ? 0.68 : 0.71);
+    const sx = isRound ? 1.04 : 1.12;
 
-    ctx.fillText(chars[0], colRight, rowTop);
-    ctx.fillText(chars[1], colRight, rowBottom);
-    ctx.fillText(chars[2], colLeft, rowTop);
-    ctx.fillText(chars[3], colLeft, rowBottom);
+    drawSealChar(chars[0], colRight, rowTop, fontSize, sx, 1.0);
+    drawSealChar(chars[1], colRight, rowBottom, fontSize, sx, 1.0);
+    drawSealChar(chars[2], colLeft, rowTop, fontSize, sx, 1.0);
+    drawSealChar(chars[3], colLeft, rowBottom, fontSize, sx, 1.0);
   } else {
-    // 【多字印 (5~6字)】：雙列多行自適應
-    const fontSize = Math.floor(size * 0.26);
-    ctx.font = `normal normal ${fontSize}px ${ANCIENT_SEAL_FONT_STACK}`;
+    // 【多字印 (5~6字)】：雙列多行自適應，緊湊布白
     const half = Math.ceil(numChars / 2);
     const rightCol = chars.slice(0, half);
     const leftCol = chars.slice(half);
+    const maxRows = Math.max(rightCol.length, leftCol.length);
+    const fontSize = Math.floor(size * (0.84 / maxRows));
+    const colRight = x + size * (isRound ? 0.68 : 0.73);
+    const colLeft = x + size * (isRound ? 0.32 : 0.27);
 
-    const stepRight = (size * 0.75) / Math.max(1, rightCol.length);
-    const startYRight = y + size * 0.18 + stepRight / 2;
+    const stepRight = (size * 0.84) / Math.max(1, rightCol.length);
+    const startYRight = y + size * 0.08 + stepRight / 2;
     rightCol.forEach((c, i) => {
-      ctx.fillText(c, x + size * 0.72, startYRight + i * stepRight);
+      drawSealChar(c, colRight, startYRight + i * stepRight, fontSize, 1.10, 1.0);
     });
 
-    const stepLeft = (size * 0.75) / Math.max(1, leftCol.length);
-    const startYLeft = y + size * 0.18 + stepLeft / 2;
+    const stepLeft = (size * 0.84) / Math.max(1, leftCol.length);
+    const startYLeft = y + size * 0.08 + stepLeft / 2;
     leftCol.forEach((c, i) => {
-      ctx.fillText(c, x + size * 0.28, startYLeft + i * stepLeft);
+      drawSealChar(c, colLeft, startYLeft + i * stepLeft, fontSize, 1.10, 1.0);
     });
   }
 

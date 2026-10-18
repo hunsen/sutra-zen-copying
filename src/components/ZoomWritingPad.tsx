@@ -319,10 +319,10 @@ export const ZoomWritingPad: React.FC<ZoomWritingPadProps> = ({
     );
     ctx.restore();
 
-    // 3. 绘制楷体小楷字模（正体名家底帖）
+    // 3. 绘制楷体小楷字模（正体名家底帖，加大字模在米字格中的占比，使气韵舒展饱满）
     if (showGuideChar && currentChar) {
       ctx.save();
-      const fontSize = Math.floor(innerSize * 0.72);
+      const fontSize = Math.floor(innerSize * 0.88);
       ctx.font = `normal normal 400 ${fontSize}px "Kaiti TC", "BiauKai", "DFKai-SB", "TW-MOE-Std-Kai", "Kaiti SC", "STKaiti", "KaiTi", serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
