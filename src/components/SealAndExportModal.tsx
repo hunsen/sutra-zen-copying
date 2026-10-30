@@ -154,7 +154,8 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 sm:p-1.5 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
+            aria-label="关闭装裱钤印弹窗"
+            className="p-1 sm:p-1.5 rounded-full hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none"
           >
             <X size={18} />
           </button>
@@ -180,28 +181,30 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
 
               <div className="flex-1 flex flex-col gap-3">
                 <div>
-                  <label className="text-xs text-stone-400 block mb-1">
+                  <label htmlFor="seal-text-input" className="text-xs text-stone-400 block mb-1">
                     篆刻印文（1~4字，小篆自適應佈局）
                   </label>
                   <input
+                    id="seal-text-input"
                     type="text"
                     maxLength={4}
                     value={sealText}
                     onChange={(e) => setSealText(toTraditional(e.target.value).slice(0, 4))}
                     placeholder="輸入印文，例如：靜、靜心、清淨心、吉祥如意"
-                    className="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-1.5 text-sm text-stone-100 focus:outline-none focus:border-amber-600 transition-colors"
+                    className="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-1.5 text-sm text-stone-100 focus:outline-none focus:border-amber-600 focus-visible:ring-2 focus-visible:ring-amber-500 transition-colors"
                   />
                 </div>
 
                 <div>
-                  <span className="text-xs text-stone-400 block mb-1.5">
+                  <span id="seal-style-label" className="text-xs text-stone-400 block mb-1.5">
                     印章形制
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3" role="group" aria-labelledby="seal-style-label">
                     <button
                       type="button"
+                      aria-pressed={sealStyle === 'bai'}
                       onClick={() => setSealStyle('bai')}
-                      className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-medium border transition-all ${
+                      className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-medium border transition-all focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none ${
                         sealStyle === 'bai'
                           ? 'bg-amber-900/60 border-amber-600 text-amber-200 shadow-sm'
                           : 'bg-stone-800/60 border-stone-700 text-stone-400 hover:text-stone-200'
@@ -211,8 +214,9 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
                     </button>
                     <button
                       type="button"
+                      aria-pressed={sealStyle === 'zhu'}
                       onClick={() => setSealStyle('zhu')}
-                      className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-medium border transition-all ${
+                      className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-medium border transition-all focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none ${
                         sealStyle === 'zhu'
                           ? 'bg-amber-900/60 border-amber-600 text-amber-200 shadow-sm'
                           : 'bg-stone-800/60 border-stone-700 text-stone-400 hover:text-stone-200'
@@ -228,22 +232,23 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
             {/* 回向文配置 */}
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-amber-200">
+                <label htmlFor="dedication-textarea" className="text-xs font-medium text-amber-200">
                   卷尾發願回向文
-                </span>
+                </label>
                 <span className="text-[11px] text-stone-400">
                   可直接選用經典回向偈，或自定善願
                 </span>
               </div>
 
               {/* 常用回向文模板快捷选择 */}
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="常用回向偈模板">
                 {DEDICATION_TEMPLATES.map((tmpl, idx) => (
                   <button
                     key={idx}
                     type="button"
+                    aria-label={`选择回向偈：${tmpl}`}
                     onClick={() => setDedicationText(tmpl)}
-                    className={`text-[11px] px-2.5 py-1 rounded-full border transition-all truncate max-w-[200px] ${
+                    className={`text-[11px] px-2.5 py-1 rounded-full border transition-all truncate max-w-[200px] focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none ${
                       dedicationText === tmpl
                         ? 'bg-amber-900/50 border-amber-600 text-amber-200'
                         : 'bg-stone-800/40 border-stone-700 text-stone-400 hover:text-stone-300'
@@ -255,11 +260,12 @@ export const SealAndExportModal: React.FC<SealAndExportModalProps> = ({
               </div>
 
               <textarea
+                id="dedication-textarea"
                 rows={2}
                 value={dedicationText}
                 onChange={(e) => setDedicationText(e.target.value)}
                 placeholder="願以此抄經功德，回向一切眾生，平安喜樂..."
-                className="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-xs text-stone-200 leading-relaxed focus:outline-none focus:border-amber-600 transition-colors resize-none"
+                className="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-xs text-stone-200 leading-relaxed focus:outline-none focus:border-amber-600 focus-visible:ring-2 focus-visible:ring-amber-500 transition-colors resize-none"
               />
             </div>
 
